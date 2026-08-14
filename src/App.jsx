@@ -10,6 +10,7 @@ import LeadDetailDrawer from './components/drawer/LeadDetailDrawer';
 import AddLeadModal from './components/modals/AddLeadModal';
 import LostReasonModal from './components/modals/LostReasonModal';
 import Toast from './components/common/Toast';
+import PocContactBanner from './components/common/PocContactBanner';
 
 function CRMContent() {
   const { viewMode } = useLeads();
@@ -38,6 +39,9 @@ function CRMContent() {
       {/* Modals */}
       <AddLeadModal />
       <LostReasonModal />
+
+      {/* Floating POC Contact Developer Banner */}
+      <PocContactBanner />
 
       {/* Toast Notification Container */}
       <Toast />

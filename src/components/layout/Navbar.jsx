@@ -14,7 +14,9 @@ import {
   Sun, 
   ChevronDown, 
   Info,
-  ExternalLink
+  MessageSquare,
+  ExternalLink,
+  ArrowUpRight
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -36,6 +38,12 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutModalOpen, setAboutModalOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const developerPhone = '60135928812';
+  const waMessage = encodeURIComponent(
+    'Hi Sharil, I tried the LeadFlow CRM POC prototype and I am interested in discussing a custom CRM / web application build for my business.'
+  );
+  const waUrl = `https://wa.me/${developerPhone}?text=${waMessage}`;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -101,6 +109,19 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* WhatsApp Developer CTA (Clean without raw phone digits) */}
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Chat with developer on WhatsApp regarding custom CRM / SaaS solutions"
+            className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-2xs cursor-pointer hover:scale-[1.02]"
+          >
+            <MessageSquare className="w-3.5 h-3.5 fill-white" />
+            <span>Contact Developer</span>
+            <ArrowUpRight className="w-3 h-3 opacity-80" />
+          </a>
+
           {/* Mockup Limit Pill Indicator */}
           <div className={`hidden sm:flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md border ${
             isLimitReached
@@ -119,11 +140,11 @@ export default function Navbar() {
             className={`hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border transition-all shadow-2xs ${
               isLimitReached
                 ? 'opacity-50 cursor-not-allowed bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700'
-                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer'
+                : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer'
             }`}
           >
-            <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>⚡ Simulate Inbound Lead</span>
+            <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            <span>⚡ Simulate Lead</span>
           </button>
 
           {/* Primary Add Lead Button */}
@@ -154,7 +175,24 @@ export default function Navbar() {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-800 py-1.5 z-50 text-xs font-medium animate-fade-in">
+              <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-800 py-1.5 z-50 text-xs font-medium animate-fade-in">
+                <div className="px-3 py-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800">
+                  POC & Developer
+                </div>
+
+                {/* WhatsApp Link in dropdown */}
+                <a
+                  href={waUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left px-3 py-2 flex items-center gap-2 text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors font-semibold"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>Contact Developer via WhatsApp</span>
+                </a>
+                
+                <div className="border-t border-zinc-100 dark:border-zinc-800 my-1" />
+
                 <div className="px-3 py-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800">
                   Workspace & Engine
                 </div>
@@ -166,7 +204,7 @@ export default function Navbar() {
                   }}
                   className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
-                  <Info className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <Info className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                   <span>About LeadFlow CRM</span>
                 </button>
 
