@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
-import { STAGES, SOURCES, PRIORITIES } from '../../data/initialLeads';
+import { SOURCES, PRIORITIES } from '../../data/initialLeads';
 import { BrandIcon } from '../common/BrandLogo';
-import { X, Plus, Sparkles, Building2, User, Phone, Mail, DollarSign, AlertCircle } from 'lucide-react';
+import { StageId, PriorityId } from '../../types';
+import { X, AlertCircle } from 'lucide-react';
 
 export default function AddLeadModal() {
   const { isAddModalOpen, setIsAddModalOpen, addLead, isLimitReached, maxLeads, leads } = useLeads();
 
-  const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [dealValue, setDealValue] = useState('');
-  const [source, setSource] = useState('Meta Ads');
-  const [priority, setPriority] = useState('medium');
-  const [stage, setStage] = useState('new');
-  const [notes, setNotes] = useState('');
+  const [name, setName] = useState<string>('');
+  const [company, setCompany] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [dealValue, setDealValue] = useState<string>('');
+  const [source, setSource] = useState<string>('Meta Ads');
+  const [priority, setPriority] = useState<PriorityId>('medium');
+  const [stage, setStage] = useState<StageId>('new');
+  const [notes, setNotes] = useState<string>('');
 
   if (!isAddModalOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLimitReached) {
       alert(`Mockup limit reached: Demo is limited to max ${maxLeads} leads. Delete an existing lead to create a new one.`);
@@ -44,7 +45,6 @@ export default function AddLeadModal() {
     });
 
     if (created) {
-      // Reset form & close
       setName('');
       setCompany('');
       setPhone('');
@@ -203,7 +203,7 @@ export default function AddLeadModal() {
               <select
                 disabled={isLimitReached}
                 value={priority}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(e.target.value as PriorityId)}
                 className="w-full text-xs p-2 rounded-md bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 cursor-pointer disabled:opacity-50"
               >
                 {PRIORITIES.map(p => (

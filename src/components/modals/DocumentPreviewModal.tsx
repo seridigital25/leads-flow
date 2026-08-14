@@ -1,25 +1,29 @@
 import React from 'react';
-import { formatCurrency, formatDate, formatShortDate } from '../../lib/utils';
+import { formatCurrency, formatShortDate } from '../../lib/utils';
+import { Lead, Quotation, Invoice } from '../../types';
 import { 
   X, 
   Printer, 
-  Download, 
   MessageSquare, 
   CheckCircle2, 
-  Building2, 
-  ShieldCheck, 
-  FileText,
-  Clock,
-  AlertCircle,
-  FileCheck
+  Clock
 } from 'lucide-react';
 
-export default function DocumentPreviewModal({ doc, lead, type, isOpen, onClose }) {
+interface DocumentPreviewModalProps {
+  doc: Quotation | Invoice | null;
+  lead: Lead | null;
+  type: 'quotation' | 'invoice';
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function DocumentPreviewModal({ doc, lead, type, isOpen, onClose }: DocumentPreviewModalProps) {
   if (!isOpen || !doc || !lead) return null;
 
   const isInvoice = type === 'invoice';
-  const isPaid = doc.status === 'paid';
-  const isApproved = doc.status === 'approved';
+  const invoiceDoc = doc as Invoice;
+  const isPaid = isInvoice && invoiceDoc.status === 'paid';
+  const isApproved = !isInvoice && (doc as Quotation).status === 'approved';
 
   const handlePrint = () => {
     window.print();
@@ -125,8 +129,8 @@ export default function DocumentPreviewModal({ doc, lead, type, isOpen, onClose 
               <div className="mt-2 space-y-0.5 text-xs font-mono">
                 <div><span className="text-zinc-400 font-sans">Doc Number:</span> <strong>{doc.number}</strong></div>
                 <div><span className="text-zinc-400 font-sans">Issue Date:</span> {formatShortDate(doc.date)}</div>
-                {doc.validUntil && <div><span className="text-zinc-400 font-sans">Valid Until:</span> {formatShortDate(doc.validUntil)}</div>}
-                {doc.dueDate && <div><span className="text-zinc-400 font-sans">Due Date:</span> {formatShortDate(doc.dueDate)}</div>}
+                {'validUntil' in doc && doc.validUntil && <div><span className="text-zinc-400 font-sans">Valid Until:</span> {formatShortDate(doc.validUntil)}</div>}
+                {'dueDate' in doc && doc.dueDate && <div><span className="text-zinc-400 font-sans">Due Date:</span> {formatShortDate(doc.dueDate)}</div>}
               </div>
 
               {/* Status Stamp Badge */}
@@ -210,7 +214,7 @@ export default function DocumentPreviewModal({ doc, lead, type, isOpen, onClose 
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="py-4 text-center text-zinc-400 font-sans">
+                    <td colSpan={5} className="py-4 text-center text-zinc-400 font-sans">
                       Tiada item direkodkan.
                     </td>
                   </tr>
@@ -254,9 +258,9 @@ export default function DocumentPreviewModal({ doc, lead, type, isOpen, onClose 
               <div className="text-zinc-600 dark:text-zinc-400 text-[11px] mt-0.5">
                 Beneficiary: <strong>LeadFlow Enterprise Solutions Sdn Bhd</strong>
               </div>
-              {isPaid && doc.paymentMethod && (
+              {isPaid && invoiceDoc.paymentMethod && (
                 <div className="mt-2 p-1.5 rounded bg-emerald-100/80 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[10px] font-mono">
-                  Verified: {doc.paymentMethod}
+                  Verified: {invoiceDoc.paymentMethod}
                 </div>
               )}
             </div>

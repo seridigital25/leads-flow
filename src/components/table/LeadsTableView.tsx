@@ -2,36 +2,34 @@ import React from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { formatCurrency, formatShortDate, getFollowUpStatus, getWhatsAppUrl } from '../../lib/utils';
 import { STAGES, PRIORITIES } from '../../data/initialLeads';
+import { Lead } from '../../types';
 import { 
   Building2, 
   Phone, 
   MessageSquare, 
   Calendar, 
-  MoreHorizontal, 
-  ExternalLink, 
   Trash2, 
   Inbox,
   FileText,
-  Receipt,
   CheckCircle2
 } from 'lucide-react';
 
 export default function LeadsTableView() {
   const { filteredLeads, moveStage, setSelectedLeadId, deleteLead } = useLeads();
 
-  const handleWhatsApp = (e, lead) => {
+  const handleWhatsApp = (e: React.MouseEvent, lead: Lead) => {
     e.stopPropagation();
     const text = `Hi ${lead.name}! Thanks for connecting with us.`;
     const waUrl = getWhatsAppUrl(lead.phone, text);
     window.open(waUrl, '_blank');
   };
 
-  const handleCall = (e, phone) => {
+  const handleCall = (e: React.MouseEvent, phone: string) => {
     e.stopPropagation();
     window.location.href = `tel:${phone}`;
   };
 
-  const handleDelete = (e, leadId) => {
+  const handleDelete = (e: React.MouseEvent, leadId: string) => {
     e.stopPropagation();
     if (window.confirm('Delete this lead record?')) {
       deleteLead(leadId);
@@ -99,11 +97,11 @@ export default function LeadsTableView() {
                         </div>
                         {hasPaidInvoice ? (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 font-mono mt-0.5">
-                            <CheckCircle2 className="w-3 h-3" /> INV #{lead.invoices[0]?.number} (Paid)
+                            <CheckCircle2 className="w-3 h-3" /> INV #{lead.invoices?.[0]?.number} (Paid)
                           </span>
                         ) : hasQuotation ? (
                           <span className="inline-flex items-center gap-1 text-[10px] font-medium text-blue-700 dark:text-blue-400 font-mono mt-0.5">
-                            <FileText className="w-3 h-3" /> QT #{lead.quotations[0]?.number}
+                            <FileText className="w-3 h-3" /> QT #{lead.quotations?.[0]?.number}
                           </span>
                         ) : null}
                       </td>
@@ -177,7 +175,7 @@ export default function LeadsTableView() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-12 text-center text-zinc-400">
+                  <td colSpan={7} className="py-12 text-center text-zinc-400">
                     <Inbox className="w-8 h-8 mx-auto mb-2 opacity-40" />
                     <p className="text-sm font-medium">No leads found matching current filters.</p>
                   </td>

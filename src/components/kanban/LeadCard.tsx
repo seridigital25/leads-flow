@@ -1,42 +1,40 @@
 import React from 'react';
 import { useLeads } from '../../context/LeadContext';
-import { formatCurrency, formatShortDate, getFollowUpStatus, getRelativeTime, getWhatsAppUrl } from '../../lib/utils';
-import { STAGES, PRIORITIES } from '../../data/initialLeads';
+import { formatCurrency, getFollowUpStatus, getRelativeTime, getWhatsAppUrl } from '../../lib/utils';
+import { PRIORITIES } from '../../data/initialLeads';
+import { Lead } from '../../types';
 import { 
   Phone, 
   MessageSquare, 
-  Clock, 
   Calendar, 
   Building2, 
-  AlertCircle, 
-  ChevronRight, 
-  MoreHorizontal,
-  Flame,
-  ArrowRight,
   FileText,
-  Receipt,
   CheckCircle2
 } from 'lucide-react';
 
-export default function LeadCard({ lead }) {
-  const { setSelectedLeadId, moveStage } = useLeads();
+interface LeadCardProps {
+  lead: Lead;
+}
+
+export default function LeadCard({ lead }: LeadCardProps) {
+  const { setSelectedLeadId } = useLeads();
 
   const priorityObj = PRIORITIES.find(p => p.id === lead.priority) || PRIORITIES[2];
   const followUpInfo = getFollowUpStatus(lead.nextFollowUpDate);
 
-  const handleDragStart = (e) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData('text/plain', lead.id);
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleWhatsAppClick = (e) => {
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     const text = `Hi ${lead.name}! Thanks for reaching out to us. How can we best help you with your requirements today?`;
     const waUrl = getWhatsAppUrl(lead.phone, text);
     window.open(waUrl, '_blank');
   };
 
-  const handleCallClick = (e) => {
+  const handleCallClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     window.location.href = `tel:${lead.phone}`;
   };
@@ -91,12 +89,12 @@ export default function LeadCard({ lead }) {
       {hasPaidInvoice ? (
         <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80 font-mono">
           <CheckCircle2 className="w-3 h-3" />
-          <span>INV #{lead.invoices[0]?.number} (PAID)</span>
+          <span>INV #{lead.invoices?.[0]?.number} (PAID)</span>
         </div>
       ) : hasQuotation ? (
         <div className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/80 font-mono">
           <FileText className="w-3 h-3" />
-          <span>QT #{lead.quotations[0]?.number} ({lead.quotations[0]?.status})</span>
+          <span>QT #{lead.quotations?.[0]?.number} ({lead.quotations?.[0]?.status})</span>
         </div>
       ) : lead.notes ? (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/40 rounded p-1.5 mt-2 line-clamp-2 border border-zinc-100 dark:border-zinc-800/80 leading-relaxed italic">

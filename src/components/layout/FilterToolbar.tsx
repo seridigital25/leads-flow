@@ -1,34 +1,29 @@
 import React from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { SOURCES, PRIORITIES } from '../../data/initialLeads';
-import { 
-  Search, 
-  Filter, 
-  ArrowUpDown, 
-  X, 
-  SlidersHorizontal 
-} from 'lucide-react';
+import { SortOption } from '../../types';
+import { Search, ArrowUpDown, X } from 'lucide-react';
 
 export default function FilterToolbar() {
   const {
     searchQuery,
     setSearchQuery,
-    sourceFilter,
-    setSourceFilter,
-    priorityFilter,
-    setPriorityFilter,
+    selectedSource,
+    setSelectedSource,
+    selectedPriority,
+    setSelectedPriority,
     sortBy,
     setSortBy,
     filteredLeads,
     leads
   } = useLeads();
 
-  const hasActiveFilters = searchQuery || sourceFilter !== 'all' || priorityFilter !== 'all';
+  const hasActiveFilters = searchQuery || selectedSource !== 'all' || selectedPriority !== 'all';
 
   const clearFilters = () => {
     setSearchQuery('');
-    setSourceFilter('all');
-    setPriorityFilter('all');
+    setSelectedSource('all');
+    setSelectedPriority('all');
   };
 
   return (
@@ -40,7 +35,7 @@ export default function FilterToolbar() {
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
-            placeholder="Search leads, companies, phone, tags..."
+            placeholder="Search leads, companies, phone, notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-7 py-1.5 text-xs rounded-md bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-hidden focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-400 transition-all"
@@ -58,8 +53,8 @@ export default function FilterToolbar() {
         {/* Source Filter */}
         <div className="flex items-center">
           <select
-            value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
             className="text-xs py-1.5 px-2.5 rounded-md bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-400 cursor-pointer"
           >
             <option value="all">All Sources</option>
@@ -72,8 +67,8 @@ export default function FilterToolbar() {
         {/* Priority Filter */}
         <div className="flex items-center">
           <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
+            value={selectedPriority}
+            onChange={(e) => setSelectedPriority(e.target.value)}
             className="text-xs py-1.5 px-2.5 rounded-md bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-400 cursor-pointer"
           >
             <option value="all">All Priorities</option>
@@ -105,14 +100,14 @@ export default function FilterToolbar() {
           <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400" />
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
             className="text-xs py-1.5 px-2.5 rounded-md bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-400 cursor-pointer font-medium"
           >
             <option value="newest">Sort: Newest First</option>
-            <option value="deal-desc">Value: High to Low</option>
-            <option value="deal-asc">Value: Low to High</option>
+            <option value="value_desc">Value: High to Low</option>
+            <option value="value_asc">Value: Low to High</option>
             <option value="followup">Follow-up Date</option>
-            <option value="name">Name (A-Z)</option>
+            <option value="name_asc">Name (A-Z)</option>
           </select>
         </div>
       </div>

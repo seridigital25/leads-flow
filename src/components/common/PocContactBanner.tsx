@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { MessageSquare, X, Sparkles, ArrowUpRight } from 'lucide-react';
+import { MessageSquare, X, ArrowUpRight } from 'lucide-react';
 
 export default function PocContactBanner() {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
 
   const developerPhone = '60135928812';
   const waMessage = encodeURIComponent(

@@ -15,7 +15,6 @@ import {
   ChevronDown, 
   Info,
   MessageSquare,
-  ExternalLink,
   ArrowUpRight
 } from 'lucide-react';
 
@@ -35,9 +34,9 @@ export default function Navbar() {
     showToast
   } = useLeads();
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [aboutModalOpen, setAboutModalOpen] = useState(false);
-  const menuRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [aboutModalOpen, setAboutModalOpen] = useState<boolean>(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const developerPhone = '60135928812';
   const waMessage = encodeURIComponent(
@@ -46,8 +45,8 @@ export default function Navbar() {
   const waUrl = `https://wa.me/${developerPhone}?text=${waMessage}`;
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
     }
@@ -109,7 +108,7 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* WhatsApp Developer CTA (Clean without raw phone digits) */}
+          {/* WhatsApp Developer CTA */}
           <a
             href={waUrl}
             target="_blank"
@@ -158,7 +157,7 @@ export default function Navbar() {
 
           {/* Dark Mode Toggle */}
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={() => setDarkMode((prev: boolean) => !prev)}
             title="Toggle Dark / Light Mode"
             className="p-1.5 rounded-md text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
           >

@@ -3,31 +3,24 @@ import { useLeads } from '../../context/LeadContext';
 import { STAGES, SOURCES, LOST_REASONS } from '../../data/initialLeads';
 import { formatCurrency } from '../../lib/utils';
 import { BrandIcon } from '../common/BrandLogo';
+import { StageId } from '../../types';
 import { 
-  BarChart3, 
-  TrendingUp, 
   PieChart, 
-  Layers, 
   Target, 
-  UserCheck, 
   Award,
-  AlertOctagon,
-  ArrowRight,
-  Sparkles,
-  ShieldCheck,
-  Zap
+  AlertOctagon
 } from 'lucide-react';
 
 export default function AnalyticsView() {
   const { leads, stats } = useLeads();
 
   // Funnel progression
-  const funnelStages = ['new', 'contacted', 'qualified', 'proposal_sent', 'won'];
-  const maxFunnelCount = Math.max(1, ...funnelStages.map(s => stats.stageSummary[s]?.count || 0));
+  const funnelStages: StageId[] = ['new', 'contacted', 'qualified', 'proposal_sent', 'won'];
+  const maxFunnelCount = Math.max(1, ...funnelStages.map(s => leads.filter(l => l.stage === s).length));
 
   // Lost reasons calculation
   const lostLeads = leads.filter(l => l.stage === 'lost');
-  const lostReasonCounts = {};
+  const lostReasonCounts: Record<string, number> = {};
   LOST_REASONS.forEach(r => { lostReasonCounts[r] = 0; });
   lostLeads.forEach(l => {
     const reason = l.lostReason || 'Other / Not Specified';
@@ -38,7 +31,6 @@ export default function AnalyticsView() {
     <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-zinc-100/60 dark:bg-zinc-950 space-y-6">
       {/* Executive LeadFlow Intelligence Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 text-white rounded-2xl p-5 sm:p-6 border border-zinc-800 shadow-lg shadow-emerald-500/5">
-        {/* Subtle Background Glow */}
         <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -63,7 +55,7 @@ export default function AnalyticsView() {
             <div className="text-left lg:text-right">
               <span className="text-[11px] uppercase font-semibold tracking-wider text-zinc-400">Closed Won Revenue</span>
               <div className="text-lg sm:text-xl font-extrabold text-emerald-400 font-mono">
-                {formatCurrency(stats.wonValue)}
+                {formatCurrency(stats.wonRevenue)}
               </div>
             </div>
             <div className="h-8 w-px bg-zinc-800" />
@@ -91,8 +83,10 @@ export default function AnalyticsView() {
           <div className="space-y-3">
             {funnelStages.map((stageId, idx) => {
               const stage = STAGES.find(s => s.id === stageId);
-              const data = stats.stageSummary[stageId] || { count: 0, value: 0 };
-              const widthPct = Math.max(12, Math.round((data.count / maxFunnelCount) * 100));
+              const stageLeads = leads.filter(l => l.stage === stageId);
+              const count = stageLeads.length;
+              const totalVal = stageLeads.reduce((acc, curr) => acc + (Number(curr.dealValue) || 0), 0);
+              const widthPct = Math.max(12, Math.round((count / maxFunnelCount) * 100));
 
               return (
                 <div key={stageId} className="space-y-1">
@@ -104,7 +98,7 @@ export default function AnalyticsView() {
                       <span>{stage?.label}</span>
                     </span>
                     <span className="font-mono text-zinc-900 dark:text-zinc-100 font-bold">
-                      {data.count} leads ({formatCurrency(data.value)})
+                      {count} leads ({formatCurrency(totalVal)})
                     </span>
                   </div>
 
@@ -137,8 +131,10 @@ export default function AnalyticsView() {
 
           <div className="space-y-3.5">
             {SOURCES.map(source => {
-              const srcData = stats.sourceBreakdown[source] || { count: 0, value: 0, wonCount: 0 };
-              const leadShare = Math.round((srcData.count / (leads.length || 1)) * 100);
+              const srcLeads = leads.filter(l => l.source === source);
+              const count = srcLeads.length;
+              const totalVal = srcLeads.reduce((acc, curr) => acc + (Number(curr.dealValue) || 0), 0);
+              const leadShare = Math.round((count / (leads.length || 1)) * 100);
 
               return (
                 <div key={source} className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
@@ -147,9 +143,9 @@ export default function AnalyticsView() {
                       {source}
                     </span>
                     <div className="flex items-center gap-2 font-mono">
-                      <span className="text-zinc-500 dark:text-zinc-400">{srcData.count} leads</span>
+                      <span className="text-zinc-500 dark:text-zinc-400">{count} leads</span>
                       <span className="font-bold text-zinc-900 dark:text-zinc-100">
-                        {formatCurrency(srcData.value)}
+                        {formatCurrency(totalVal)}
                       </span>
                     </div>
                   </div>
@@ -177,13 +173,13 @@ export default function AnalyticsView() {
               <span>Deal Loss Reason Taxonomy</span>
             </h3>
             <span className="text-xs text-rose-600 dark:text-rose-400 font-semibold font-mono">
-              {stats.lostCount} Lost Deals
+              {lostLeads.length} Lost Deals
             </span>
           </div>
 
           <div className="space-y-2.5">
             {Object.entries(lostReasonCounts).map(([reason, count]) => {
-              const pct = stats.lostCount > 0 ? Math.round((count / stats.lostCount) * 100) : 0;
+              const pct = lostLeads.length > 0 ? Math.round((count / lostLeads.length) * 100) : 0;
 
               return (
                 <div key={reason} className="flex items-center justify-between text-xs p-2 rounded bg-zinc-50 dark:bg-zinc-800/40">

@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { formatCurrency } from '../../lib/utils';
-import { X, Plus, Trash2, FileText, Receipt, Sparkles } from 'lucide-react';
+import { Lead, DocumentItem, Quotation, Invoice, QuotationStatus, InvoiceStatus } from '../../types';
+import { X, Plus, Trash2, FileText, Receipt } from 'lucide-react';
 
-export default function CreateDocumentModal({ isOpen, onClose, lead, docType = 'quotation' }) {
+interface CreateDocumentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  lead: Lead | null;
+  docType?: 'quotation' | 'invoice';
+}
+
+export default function CreateDocumentModal({ isOpen, onClose, lead, docType = 'quotation' }: CreateDocumentModalProps) {
   const { updateLead, addActivity, showToast } = useLeads();
 
   const isInvoice = docType === 'invoice';
 
-  const [items, setItems] = useState([
+  const [items, setItems] = useState<DocumentItem[]>([
     { description: lead ? `${lead.company || lead.name} — Implementation Service` : 'Custom Solution Package', qty: 1, unitPrice: lead?.dealValue || 5000 }
   ]);
-  const [docNumber, setDocNumber] = useState(() => {
+  const [docNumber, setDocNumber] = useState<string>(() => {
     const randomCode = Math.floor(1000 + Math.random() * 9000);
     return isInvoice ? `INV-2026-${randomCode}` : `QT-2026-${randomCode}`;
   });
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [expiryOrDue, setExpiryOrDue] = useState(() => {
+  const [date, setDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [expiryOrDue, setExpiryOrDue] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + 14);
     return d.toISOString().split('T')[0];
   });
-  const [status, setStatus] = useState(isInvoice ? 'unpaid' : 'sent');
-  const [notes, setNotes] = useState('Payment terms: 14 days from date of document. Price is inclusive of standard support.');
+  const [status, setStatus] = useState<string>(isInvoice ? 'unpaid' : 'sent');
+  const [notes, setNotes] = useState<string>('Payment terms: 14 days from date of document. Price is inclusive of standard support.');
 
   if (!isOpen || !lead) return null;
 
@@ -30,7 +38,7 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
     setItems(prev => [...prev, { description: '', qty: 1, unitPrice: 1000 }]);
   };
 
-  const handleItemChange = (index, field, value) => {
+  const handleItemChange = (index: number, field: keyof DocumentItem, value: string | number) => {
     setItems(prev => prev.map((item, idx) => {
       if (idx === index) {
         return { ...item, [field]: value };
@@ -39,7 +47,7 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
     }));
   };
 
-  const handleRemoveItem = (index) => {
+  const handleRemoveItem = (index: number) => {
     if (items.length <= 1) return;
     setItems(prev => prev.filter((_, idx) => idx !== index));
   };
@@ -50,10 +58,10 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
 
   const totalAmount = calculateTotal();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formattedItems = items.map(item => ({
+    const formattedItems: DocumentItem[] = items.map(item => ({
       description: item.description || 'General Service Item',
       qty: Number(item.qty) || 1,
       unitPrice: Number(item.unitPrice) || 0,
@@ -61,12 +69,12 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
     }));
 
     if (isInvoice) {
-      const newInvoice = {
+      const newInvoice: Invoice = {
         id: `inv-${Date.now()}`,
         number: docNumber,
         date: date,
         dueDate: expiryOrDue,
-        status: status, // 'unpaid' | 'paid'
+        status: status as InvoiceStatus,
         items: formattedItems,
         subtotal: totalAmount,
         tax: 0,
@@ -88,14 +96,14 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
         author: 'You'
       });
 
-      showToast(`Invoice #${docNumber} berjaya dicipta!`);
+      showToast(`Invoice #${docNumber} created successfully!`);
     } else {
-      const newQuotation = {
+      const newQuotation: Quotation = {
         id: `qt-${Date.now()}`,
         number: docNumber,
         date: date,
         validUntil: expiryOrDue,
-        status: status, // 'draft' | 'sent' | 'approved'
+        status: status as QuotationStatus,
         items: formattedItems,
         subtotal: totalAmount,
         tax: 0,
@@ -116,7 +124,7 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
         author: 'You'
       });
 
-      showToast(`Quotation #${docNumber} berjaya dicipta!`);
+      showToast(`Quotation #${docNumber} created successfully!`);
     }
 
     onClose();
@@ -276,7 +284,7 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
                       min="1"
                       placeholder="Qty"
                       value={item.qty}
-                      onChange={(e) => handleItemChange(idx, 'qty', e.target.value)}
+                      onChange={(e) => handleItemChange(idx, 'qty', parseInt(e.target.value) || 1)}
                       className="w-full text-xs p-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-center font-mono"
                     />
                   </div>
@@ -286,7 +294,7 @@ export default function CreateDocumentModal({ isOpen, onClose, lead, docType = '
                       min="0"
                       placeholder="Unit Price (RM)"
                       value={item.unitPrice}
-                      onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
+                      onChange={(e) => handleItemChange(idx, 'unitPrice', parseFloat(e.target.value) || 0)}
                       className="w-full text-xs p-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-right font-mono"
                     />
                   </div>

@@ -1,16 +1,7 @@
 import React from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { formatCurrency } from '../../lib/utils';
-import { 
-  TrendingUp, 
-  DollarSign, 
-  CalendarClock, 
-  Zap, 
-  CheckCircle2, 
-  AlertTriangle,
-  Flame,
-  ArrowUpRight
-} from 'lucide-react';
+import { TrendingUp, CalendarClock, AlertTriangle } from 'lucide-react';
 
 export default function MetricsBar() {
   const { stats } = useLeads();
@@ -29,7 +20,7 @@ export default function MetricsBar() {
               {formatCurrency(stats.activePipelineValue)}
             </span>
             <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-              {stats.activeCount} deals
+              {stats.totalLeads} leads
             </span>
           </div>
         </div>
@@ -44,10 +35,7 @@ export default function MetricsBar() {
           </div>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="text-base sm:text-lg font-bold tracking-tight text-emerald-700 dark:text-emerald-400 font-mono">
-              {formatCurrency(stats.wonValue)}
-            </span>
-            <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-              {stats.wonCount} won
+              {formatCurrency(stats.wonRevenue)}
             </span>
           </div>
         </div>
@@ -60,17 +48,11 @@ export default function MetricsBar() {
           </div>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-mono">
-              {stats.dueTodayCount}
+              {stats.followUpsDueCount}
             </span>
             <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-              due today
+              due / pending
             </span>
-            {stats.overdueCount > 0 && (
-              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400">
-                <AlertTriangle className="w-2.5 h-2.5" />
-                {stats.overdueCount} overdue
-              </span>
-            )}
           </div>
         </div>
 
@@ -96,15 +78,15 @@ export default function MetricsBar() {
         {/* KPI 5: Total Volume */}
         <div className="hidden lg:flex p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/70 dark:border-zinc-700/60 flex-col justify-between">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-xs">
-            <span className="font-medium">Total Database</span>
+            <span className="font-medium">Average Deal Size</span>
             <TrendingUp className="w-3.5 h-3.5 text-zinc-400" />
           </div>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-mono">
-              {stats.total}
+              {formatCurrency(stats.avgDealSize)}
             </span>
             <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-              total leads
+              avg
             </span>
           </div>
         </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLeads } from '../../context/LeadContext';
-import { STAGES, PRIORITIES, SOURCES, QUICK_TEMPLATES } from '../../data/initialLeads';
-import { formatCurrency, formatDate, formatShortDate, getFollowUpStatus, cleanMalaysianPhone, getWhatsAppUrl } from '../../lib/utils';
+import { STAGES, PRIORITIES, QUICK_TEMPLATES } from '../../data/initialLeads';
+import { formatCurrency, formatDate, formatShortDate, getFollowUpStatus, getWhatsAppUrl } from '../../lib/utils';
+import { Lead, Quotation, Invoice, ActivityType, PriorityId } from '../../types';
 import DocumentPreviewModal from '../modals/DocumentPreviewModal';
 import CreateDocumentModal from '../modals/CreateDocumentModal';
 import { 
@@ -10,20 +11,10 @@ import {
   MessageSquare, 
   Mail, 
   Calendar, 
-  Clock, 
-  Building2, 
-  Tag, 
-  User, 
-  DollarSign, 
   Send, 
   Trash2, 
   CheckCircle2, 
-  AlertCircle,
   FileText,
-  Video,
-  CheckSquare,
-  Sparkles,
-  ExternalLink,
   Copy,
   Check,
   Receipt,
@@ -44,27 +35,27 @@ export default function LeadDetailDrawer() {
     showToast
   } = useLeads();
 
-  const [activeTab, setActiveTab] = useState('activity'); // 'activity' | 'documents' | 'bant' | 'details'
-  const [newLogType, setNewLogType] = useState('whatsapp'); // 'whatsapp' | 'call' | 'meeting' | 'note'
-  const [newLogContent, setNewLogContent] = useState('');
-  const [showWhatsAppTemplates, setShowWhatsAppTemplates] = useState(false);
-  const [copiedTemplateId, setCopiedTemplateId] = useState(null);
+  const [activeTab, setActiveTab] = useState<'activity' | 'documents' | 'bant' | 'details'>('activity');
+  const [newLogType, setNewLogType] = useState<ActivityType>('whatsapp');
+  const [newLogContent, setNewLogContent] = useState<string>('');
+  const [showWhatsAppTemplates, setShowWhatsAppTemplates] = useState<boolean>(false);
+  const [copiedTemplateId, setCopiedTemplateId] = useState<string | null>(null);
 
   // Document modal states
-  const [previewDoc, setPreviewDoc] = useState(null);
-  const [previewType, setPreviewType] = useState('quotation');
-  const [isDocPreviewOpen, setIsDocPreviewOpen] = useState(false);
-  const [isCreateDocOpen, setIsCreateDocOpen] = useState(false);
-  const [createDocType, setCreateDocType] = useState('quotation');
+  const [previewDoc, setPreviewDoc] = useState<Quotation | Invoice | null>(null);
+  const [previewType, setPreviewType] = useState<'quotation' | 'invoice'>('quotation');
+  const [isDocPreviewOpen, setIsDocPreviewOpen] = useState<boolean>(false);
+  const [isCreateDocOpen, setIsCreateDocOpen] = useState<boolean>(false);
+  const [createDocType, setCreateDocType] = useState<'quotation' | 'invoice'>('quotation');
 
   // Editable fields local state
-  const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [dealValue, setDealValue] = useState(0);
-  const [nextFollowUpDate, setNextFollowUpDate] = useState('');
-  const [notes, setNotes] = useState('');
+  const [name, setName] = useState<string>('');
+  const [company, setCompany] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [dealValue, setDealValue] = useState<number>(0);
+  const [nextFollowUpDate, setNextFollowUpDate] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
 
   useEffect(() => {
     if (selectedLead) {
@@ -84,11 +75,11 @@ export default function LeadDetailDrawer() {
   const quotations = selectedLead.quotations || [];
   const invoices = selectedLead.invoices || [];
 
-  const handleSaveField = (field, value) => {
+  const handleSaveField = (field: keyof Lead, value: any) => {
     updateLead(selectedLead.id, { [field]: value });
   };
 
-  const handleAddActivitySubmit = (e) => {
+  const handleAddActivitySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLogContent.trim()) return;
     addActivity(selectedLead.id, {
@@ -99,7 +90,7 @@ export default function LeadDetailDrawer() {
     setNewLogContent('');
   };
 
-  const getProcessedTemplate = (templateStr, docNumber = '') => {
+  const getProcessedTemplate = (templateStr: string, docNumber: string = '') => {
     return templateStr
       .replace(/{{name}}/g, name || 'there')
       .replace(/{{company}}/g, company || 'your business')
@@ -108,7 +99,7 @@ export default function LeadDetailDrawer() {
       .replace(/{{agent}}/g, selectedLead.assignedTo?.split(' ')[0] || 'Aiman');
   };
 
-  const handleSendWhatsApp = (templateText) => {
+  const handleSendWhatsApp = (templateText?: string) => {
     const defaultMsg = `Hi ${name}! Thanks for reaching out to us. How can we best assist you with your requirements today?`;
     const text = templateText ? getProcessedTemplate(templateText) : defaultMsg;
     const waUrl = getWhatsAppUrl(phone, text);
@@ -123,7 +114,7 @@ export default function LeadDetailDrawer() {
     setShowWhatsAppTemplates(false);
   };
 
-  const handleCopyTemplate = (e, templateId, templateText) => {
+  const handleCopyTemplate = (e: React.MouseEvent, templateId: string, templateText: string) => {
     e.stopPropagation();
     const text = getProcessedTemplate(templateText);
     navigator.clipboard.writeText(text);
@@ -132,7 +123,7 @@ export default function LeadDetailDrawer() {
     setTimeout(() => setCopiedTemplateId(null), 2000);
   };
 
-  const setQuickFollowUp = (days) => {
+  const setQuickFollowUp = (days: number) => {
     const d = new Date();
     d.setDate(d.getDate() + days);
     const dateStr = d.toISOString().split('T')[0];
@@ -141,16 +132,16 @@ export default function LeadDetailDrawer() {
     showToast(`Next follow-up scheduled for ${dateStr}`);
   };
 
-  const openPreview = (doc, type) => {
+  const openPreview = (doc: Quotation | Invoice, type: 'quotation' | 'invoice') => {
     setPreviewDoc(doc);
     setPreviewType(type);
     setIsDocPreviewOpen(true);
   };
 
-  const handleConvertToInvoice = (quote) => {
+  const handleConvertToInvoice = (quote: Quotation) => {
     const randomCode = Math.floor(1000 + Math.random() * 9000);
     const invoiceNum = `INV-2026-${randomCode}`;
-    const newInvoice = {
+    const newInvoice: Invoice = {
       id: `inv-${Date.now()}`,
       number: invoiceNum,
       date: new Date().toISOString().split('T')[0],
@@ -163,7 +154,7 @@ export default function LeadDetailDrawer() {
       notes: `Converted from approved Quotation #${quote.number}.`
     };
 
-    const updatedQuotations = quotations.map(q => q.id === quote.id ? { ...q, status: 'approved' } : q);
+    const updatedQuotations = quotations.map(q => q.id === quote.id ? { ...q, status: 'approved' as const } : q);
 
     updateLead(selectedLead.id, {
       quotations: updatedQuotations,
@@ -177,15 +168,15 @@ export default function LeadDetailDrawer() {
       author: 'You'
     });
 
-    showToast(`Invois #${invoiceNum} dijana dari Quotation #${quote.number}!`);
+    showToast(`Invoice #${invoiceNum} generated from Quotation #${quote.number}!`);
   };
 
-  const handleMarkInvoicePaid = (inv) => {
+  const handleMarkInvoicePaid = (inv: Invoice) => {
     const updatedInvoices = invoices.map(i => {
       if (i.id === inv.id) {
         return {
           ...i,
-          status: 'paid',
+          status: 'paid' as const,
           paidAt: new Date().toISOString(),
           paymentMethod: 'Maybank Instant Online Transfer'
         };
@@ -204,7 +195,7 @@ export default function LeadDetailDrawer() {
       author: 'You'
     });
 
-    showToast(`Invois #${inv.number} ditandakan sebagai Telah Dibayar!`);
+    showToast(`Invoice #${inv.number} marked as Paid!`);
   };
 
   return (
@@ -374,7 +365,7 @@ export default function LeadDetailDrawer() {
                 </label>
                 <select
                   value={selectedLead.priority}
-                  onChange={(e) => handleSaveField('priority', e.target.value)}
+                  onChange={(e) => handleSaveField('priority', e.target.value as PriorityId)}
                   className="w-full text-xs font-semibold py-1.5 px-2 rounded-md bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:ring-1 focus:ring-zinc-900 cursor-pointer"
                 >
                   {PRIORITIES.map(p => (

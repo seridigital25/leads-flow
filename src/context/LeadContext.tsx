@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { SAMPLE_LEADS, STAGES, SOURCES, PRIORITIES, MAX_MOCKUP_LEADS } from '../data/initialLeads';
+import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, Stats, ToastState } from '../types';
 
 const STORAGE_KEY = 'leadflow_crm_leads_en_my_v3_15';
 const VIEW_KEY = 'leadflow_crm_view_v1';
 const DARK_KEY = 'leadflow_crm_dark_v1';
 
-const LeadContext = createContext(null);
+const LeadContext = createContext<LeadContextType | null>(null);
 
 const RANDOM_DEMO_NAMES = [
   { name: 'Khairul Aming Enterprise', rep: 'Khairul', phone: '012-888 9921', company: 'Sambal Nyet Factory Kota Bharu', source: 'TikTok Ads', value: 45000, note: 'Inquired about warehouse CRM and bulk shipping SMS/WhatsApp notifications.' },
@@ -14,14 +15,13 @@ const RANDOM_DEMO_NAMES = [
   { name: 'Syed Mokhtar', rep: 'Syed', phone: '017-222 9988', company: 'Tradewinds Freight Solutions Shah Alam', source: 'Direct WhatsApp', value: 38000, note: 'Requested formal quotation for custom B2B sales pipeline module.' },
 ];
 
-export function LeadProvider({ children }) {
-  const [leads, setLeads] = useState(() => {
+export function LeadProvider({ children }: { children: ReactNode }) {
+  const [leads, setLeads] = useState<Lead[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If stored array is larger than max limit from previous session, trim it
           return parsed.slice(0, MAX_MOCKUP_LEADS);
         }
       }
@@ -31,11 +31,15 @@ export function LeadProvider({ children }) {
     return SAMPLE_LEADS;
   });
 
-  const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem(VIEW_KEY) || 'kanban';
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem(VIEW_KEY);
+    if (saved === 'kanban' || saved === 'table' || saved === 'analytics') {
+      return saved;
+    }
+    return 'kanban';
   });
 
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem(DARK_KEY);
     if (saved !== null) {
       return saved === 'true';
@@ -46,17 +50,15 @@ export function LeadProvider({ children }) {
     return false;
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [stageFilter, setStageFilter] = useState('all');
-  const [sourceFilter, setSourceFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedSource, setSelectedSource] = useState<string>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
-  const [selectedLeadId, setSelectedLeadId] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isLostModalOpen, setIsLostModalOpen] = useState(false);
-  const [leadPendingLost, setLeadPendingLost] = useState(null);
-  const [toast, setToast] = useState(null);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [lostModalLeadId, setLostModalLeadId] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   const isLimitReached = leads.length >= MAX_MOCKUP_LEADS;
 
@@ -82,8 +84,8 @@ export function LeadProvider({ children }) {
     }
   }, [darkMode]);
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type, id: Date.now() });
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
     setTimeout(() => {
       setToast(null);
     }, 4000);
@@ -95,35 +97,35 @@ export function LeadProvider({ children }) {
   }, [leads, selectedLeadId]);
 
   // Actions
-  const addLead = (newLeadData) => {
+  const addLead = (newLeadData: Partial<Lead>): Lead | null => {
     if (leads.length >= MAX_MOCKUP_LEADS) {
       showToast(`Mockup limit reached: Demo is limited to a maximum of ${MAX_MOCKUP_LEADS} leads. Delete an existing lead to create a new one.`, 'error');
       return null;
     }
 
-    const newLead = {
+    const newLead: Lead = {
       id: `lead-${Date.now()}`,
-      name: newLeadData.name,
-      company: newLeadData.company || 'Individual / Direct Client',
-      phone: newLeadData.phone,
+      name: newLeadData.name || 'New Prospect',
+      company: newLeadData.company || 'Direct Client',
+      phone: newLeadData.phone || '',
       email: newLeadData.email || '',
       dealValue: Number(newLeadData.dealValue) || 0,
-      stage: newLeadData.stage || 'new',
-      priority: newLeadData.priority || 'medium',
+      stage: (newLeadData.stage as StageId) || 'new',
+      priority: (newLeadData.priority as PriorityId) || 'medium',
       source: newLeadData.source || 'Website Form',
       assignedTo: newLeadData.assignedTo || 'Aiman (Sales Lead)',
       createdAt: new Date().toISOString(),
-      lastContactedAt: null,
+      updatedAt: new Date().toISOString(),
       nextFollowUpDate: newLeadData.nextFollowUpDate || new Date().toISOString().split('T')[0],
-      tags: newLeadData.tags && newLeadData.tags.length > 0 ? newLeadData.tags : ['Inbound'],
       notes: newLeadData.notes || '',
-      bant: {
+      bant: newLeadData.bant || {
         budget: false,
         authority: false,
         need: true,
-        timeline: false,
-        notes: ''
+        timeline: false
       },
+      quotations: [],
+      invoices: [],
       activities: [
         {
           id: `act-${Date.now()}`,
@@ -133,7 +135,7 @@ export function LeadProvider({ children }) {
           timestamp: new Date().toISOString()
         }
       ],
-      lostReason: null
+      lostReason: undefined
     };
 
     setLeads(prev => [newLead, ...prev]);
@@ -149,7 +151,7 @@ export function LeadProvider({ children }) {
 
     const template = RANDOM_DEMO_NAMES[Math.floor(Math.random() * RANDOM_DEMO_NAMES.length)];
     const randomId = `lead-demo-${Date.now()}`;
-    const newLead = {
+    const newLead: Lead = {
       id: randomId,
       name: template.name,
       company: template.company,
@@ -161,46 +163,45 @@ export function LeadProvider({ children }) {
       source: template.source,
       assignedTo: 'Aiman (Sales Lead)',
       createdAt: new Date().toISOString(),
-      lastContactedAt: null,
+      updatedAt: new Date().toISOString(),
       nextFollowUpDate: new Date().toISOString().split('T')[0],
-      tags: ['⚡ Live Inbound Ads', template.source],
       notes: template.note,
       bant: {
         budget: true,
         authority: true,
         need: true,
-        timeline: true,
-        notes: 'High-intent inbound lead from campaign!'
+        timeline: true
       },
+      quotations: [],
+      invoices: [],
       activities: [
         {
           id: `act-${Date.now()}`,
           type: 'note',
           author: 'System',
-          content: `⚡ Webhook Inbound Triggered from ${template.source}! Inbound form submitted.`,
+          content: `⚡ Webhook Inbound Triggered from ${template.source}! Inbound inquiry received.`,
           timestamp: new Date().toISOString()
         }
       ],
-      lostReason: null
+      lostReason: undefined
     };
 
     setLeads(prev => [newLead, ...prev]);
     showToast(`⚡ New lead received from ${template.source}: "${template.name}"! (${leads.length + 1}/${MAX_MOCKUP_LEADS})`, 'info');
   };
 
-  const updateLead = (id, updates) => {
+  const updateLead = (id: string, updates: Partial<Lead>) => {
     setLeads(prev => prev.map(l => {
       if (l.id === id) {
-        return { ...l, ...updates };
+        return { ...l, ...updates, updatedAt: new Date().toISOString() };
       }
       return l;
     }));
   };
 
-  const moveStage = (leadId, newStage, lostReason = null) => {
-    if (newStage === 'lost' && !lostReason) {
-      setLeadPendingLost(leadId);
-      setIsLostModalOpen(true);
+  const moveStage = (leadId: string, newStage: StageId | string) => {
+    if (newStage === 'lost') {
+      setLostModalLeadId(leadId);
       return;
     }
 
@@ -209,18 +210,19 @@ export function LeadProvider({ children }) {
         const stageObj = STAGES.find(s => s.id === newStage);
         const stageLabel = stageObj ? stageObj.label : newStage;
         
-        const newActivity = {
+        const newActivity: Activity = {
           id: `act-${Date.now()}`,
-          type: 'stage_change',
+          type: 'note',
           author: 'You',
-          content: `Stage updated to "${stageLabel}"${lostReason ? ` (Reason: ${lostReason})` : ''}.`,
+          content: `Stage updated to "${stageLabel}".`,
           timestamp: new Date().toISOString()
         };
 
         return {
           ...l,
-          stage: newStage,
-          lostReason: newStage === 'lost' ? (lostReason || l.lostReason) : null,
+          stage: newStage as StageId,
+          lostReason: undefined,
+          updatedAt: new Date().toISOString(),
           activities: [newActivity, ...(l.activities || [])]
         };
       }
@@ -231,12 +233,38 @@ export function LeadProvider({ children }) {
     showToast(`Stage updated to ${stageObj?.label || newStage}`);
   };
 
-  const addActivity = (leadId, { type, content, author = 'You' }) => {
+  const confirmLostReason = (leadId: string, reason: string) => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        const newActivity: Activity = {
+          id: `act-${Date.now()}`,
+          type: 'note',
+          author: 'You',
+          content: `Lead marked Closed Lost. Reason: ${reason}.`,
+          timestamp: new Date().toISOString()
+        };
+
+        return {
+          ...l,
+          stage: 'lost',
+          lostReason: reason,
+          updatedAt: new Date().toISOString(),
+          activities: [newActivity, ...(l.activities || [])]
+        };
+      }
+      return l;
+    }));
+
+    setLostModalLeadId(null);
+    showToast('Lead marked as Closed Lost.');
+  };
+
+  const addActivity = (leadId: string, { type, content, author = 'You' }: Omit<Activity, 'id' | 'timestamp'>) => {
     if (!content.trim()) return;
 
     setLeads(prev => prev.map(l => {
       if (l.id === leadId) {
-        const newAct = {
+        const newAct: Activity = {
           id: `act-${Date.now()}`,
           type,
           author,
@@ -244,12 +272,12 @@ export function LeadProvider({ children }) {
           timestamp: new Date().toISOString()
         };
 
-        const updates = {
+        const updates: Partial<Lead> = {
           activities: [newAct, ...(l.activities || [])],
+          updatedAt: new Date().toISOString()
         };
 
         if (type === 'call' || type === 'whatsapp' || type === 'meeting') {
-          updates.lastContactedAt = new Date().toISOString();
           if (l.stage === 'new') {
             updates.stage = 'contacted';
           }
@@ -263,15 +291,16 @@ export function LeadProvider({ children }) {
     showToast('Activity logged successfully');
   };
 
-  const toggleBANT = (leadId, field) => {
+  const toggleBANT = (leadId: string, criteriaKey: keyof BANT) => {
     setLeads(prev => prev.map(l => {
       if (l.id === leadId) {
         const currentBant = l.bant || { budget: false, authority: false, need: false, timeline: false };
         return {
           ...l,
+          updatedAt: new Date().toISOString(),
           bant: {
             ...currentBant,
-            [field]: !currentBant[field]
+            [criteriaKey]: !currentBant[criteriaKey]
           }
         };
       }
@@ -279,7 +308,7 @@ export function LeadProvider({ children }) {
     }));
   };
 
-  const deleteLead = (leadId) => {
+  const deleteLead = (leadId: string) => {
     setLeads(prev => prev.filter(l => l.id !== leadId));
     if (selectedLeadId === leadId) setSelectedLeadId(null);
     showToast('Lead record deleted.');
@@ -306,107 +335,79 @@ export function LeadProvider({ children }) {
   // Filtered & Sorted Leads
   const filteredLeads = useMemo(() => {
     return leads.filter(lead => {
-      // Search
+      // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesName = lead.name?.toLowerCase().includes(q);
         const matchesCompany = lead.company?.toLowerCase().includes(q);
         const matchesPhone = lead.phone?.toLowerCase().includes(q);
         const matchesNotes = lead.notes?.toLowerCase().includes(q);
-        const matchesTags = lead.tags?.some(t => t.toLowerCase().includes(q));
-        if (!matchesName && !matchesCompany && !matchesPhone && !matchesNotes && !matchesTags) {
+        if (!matchesName && !matchesCompany && !matchesPhone && !matchesNotes) {
           return false;
         }
       }
 
-      // Stage
-      if (stageFilter !== 'all' && lead.stage !== stageFilter) {
+      // Source Filter
+      if (selectedSource !== 'all' && lead.source !== selectedSource) {
         return false;
       }
 
-      // Source
-      if (sourceFilter !== 'all' && lead.source !== sourceFilter) {
-        return false;
-      }
-
-      // Priority
-      if (priorityFilter !== 'all' && lead.priority !== priorityFilter) {
+      // Priority Filter
+      if (selectedPriority !== 'all' && lead.priority !== selectedPriority) {
         return false;
       }
 
       return true;
     }).sort((a, b) => {
       if (sortBy === 'newest') {
-        return new Date(b.createdAt) - new Date(a.createdAt);
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
-      if (sortBy === 'deal-desc') {
+      if (sortBy === 'value_desc') {
         return (b.dealValue || 0) - (a.dealValue || 0);
       }
-      if (sortBy === 'deal-asc') {
+      if (sortBy === 'value_asc') {
         return (a.dealValue || 0) - (b.dealValue || 0);
       }
       if (sortBy === 'followup') {
         if (!a.nextFollowUpDate) return 1;
         if (!b.nextFollowUpDate) return -1;
-        return new Date(a.nextFollowUpDate) - new Date(b.nextFollowUpDate);
+        return new Date(a.nextFollowUpDate).getTime() - new Date(b.nextFollowUpDate).getTime();
       }
-      if (sortBy === 'name') {
+      if (sortBy === 'name_asc') {
         return a.name.localeCompare(b.name);
       }
       return 0;
     });
-  }, [leads, searchQuery, stageFilter, sourceFilter, priorityFilter, sortBy]);
+  }, [leads, searchQuery, selectedSource, selectedPriority, sortBy]);
 
-  // High-Level Statistics
-  const stats = useMemo(() => {
-    const total = leads.length;
+  // Statistics Calculation
+  const stats: Stats = useMemo(() => {
+    const totalLeads = leads.length;
     const activeLeads = leads.filter(l => l.stage !== 'won' && l.stage !== 'lost');
     const wonLeads = leads.filter(l => l.stage === 'won');
     const lostLeads = leads.filter(l => l.stage === 'lost');
-    
+
     const activePipelineValue = activeLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
-    const wonValue = wonLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
-    
+    const wonRevenue = wonLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
+    const lostRevenue = lostLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
+
     const closedCount = wonLeads.length + lostLeads.length;
     const winRate = closedCount > 0 ? Math.round((wonLeads.length / closedCount) * 100) : 0;
+    const avgDealSize = totalLeads > 0 ? Math.round((activePipelineValue + wonRevenue) / totalLeads) : 0;
 
     const todayStr = new Date().toISOString().split('T')[0];
-    const dueTodayCount = leads.filter(l => l.nextFollowUpDate === todayStr && l.stage !== 'won' && l.stage !== 'lost').length;
-    const overdueCount = leads.filter(l => l.nextFollowUpDate && l.nextFollowUpDate < todayStr && l.stage !== 'won' && l.stage !== 'lost').length;
-
-    // Stage counts & values
-    const stageSummary = {};
-    STAGES.forEach(s => {
-      const stageLeads = leads.filter(l => l.stage === s.id);
-      stageSummary[s.id] = {
-        count: stageLeads.length,
-        value: stageLeads.reduce((acc, curr) => acc + (Number(curr.dealValue) || 0), 0)
-      };
-    });
-
-    // Sources breakdown
-    const sourceBreakdown = {};
-    SOURCES.forEach(src => {
-      const srcLeads = leads.filter(l => l.source === src);
-      sourceBreakdown[src] = {
-        count: srcLeads.length,
-        value: srcLeads.reduce((acc, curr) => acc + (Number(curr.dealValue) || 0), 0),
-        wonCount: srcLeads.filter(l => l.stage === 'won').length
-      };
-    });
+    const followUpsDueCount = leads.filter(
+      l => l.nextFollowUpDate && l.nextFollowUpDate <= todayStr && l.stage !== 'won' && l.stage !== 'lost'
+    ).length;
 
     return {
-      total,
-      activeCount: activeLeads.length,
+      totalLeads,
       activePipelineValue,
-      wonCount: wonLeads.length,
-      wonValue,
-      lostCount: lostLeads.length,
+      wonRevenue,
+      lostRevenue,
       winRate,
-      dueTodayCount,
-      overdueCount,
-      stageSummary,
-      sourceBreakdown,
+      avgDealSize,
+      followUpsDueCount
     };
   }, [leads]);
 
@@ -414,42 +415,39 @@ export function LeadProvider({ children }) {
     <LeadContext.Provider
       value={{
         leads,
-        filteredLeads,
-        stats,
         maxLeads: MAX_MOCKUP_LEADS,
         isLimitReached,
-        viewMode,
-        setViewMode,
-        darkMode,
-        setDarkMode,
-        searchQuery,
-        setSearchQuery,
-        stageFilter,
-        setStageFilter,
-        sourceFilter,
-        setSourceFilter,
-        priorityFilter,
-        setPriorityFilter,
-        sortBy,
-        setSortBy,
+        filteredLeads,
+        stats,
+        selectedLead,
         selectedLeadId,
         setSelectedLeadId,
-        selectedLead,
+        viewMode,
+        setViewMode,
+        searchQuery,
+        setSearchQuery,
+        selectedSource,
+        setSelectedSource,
+        selectedPriority,
+        setSelectedPriority,
+        sortBy,
+        setSortBy,
+        darkMode,
+        setDarkMode,
         isAddModalOpen,
         setIsAddModalOpen,
-        isLostModalOpen,
-        setIsLostModalOpen,
-        leadPendingLost,
-        setLeadPendingLost,
+        lostModalLeadId,
+        setLostModalLeadId,
         toast,
         showToast,
         addLead,
-        quickAddDemoLead,
         updateLead,
+        deleteLead,
         moveStage,
+        confirmLostReason,
         addActivity,
         toggleBANT,
-        deleteLead,
+        quickAddDemoLead,
         resetToDefaults,
         exportData
       }}
@@ -459,7 +457,7 @@ export function LeadProvider({ children }) {
   );
 }
 
-export function useLeads() {
+export function useLeads(): LeadContextType {
   const context = useContext(LeadContext);
   if (!context) {
     throw new Error('useLeads must be used within a LeadProvider');

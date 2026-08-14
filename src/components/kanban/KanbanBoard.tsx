@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { STAGES } from '../../data/initialLeads';
 import { formatCurrency } from '../../lib/utils';
+import { StageId } from '../../types';
 import LeadCard from './LeadCard';
 import { Plus, Inbox, Lock } from 'lucide-react';
 
 export default function KanbanBoard() {
   const { filteredLeads, moveStage, setIsAddModalOpen, isLimitReached, maxLeads, leads } = useLeads();
-  const [dragOverStage, setDragOverStage] = useState(null);
+  const [dragOverStage, setDragOverStage] = useState<StageId | null>(null);
 
-  const handleDragOver = (e, stageId) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, stageId: StageId) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     if (dragOverStage !== stageId) {
@@ -17,15 +18,14 @@ export default function KanbanBoard() {
     }
   };
 
-  const handleDragLeave = (e, stageId) => {
-    // Only reset if we left the column boundary
-    if (e.currentTarget.contains(e.relatedTarget)) return;
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>, stageId: StageId) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
     if (dragOverStage === stageId) {
       setDragOverStage(null);
     }
   };
 
-  const handleDrop = (e, stageId) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, stageId: StageId) => {
     e.preventDefault();
     setDragOverStage(null);
     const leadId = e.dataTransfer.getData('text/plain');

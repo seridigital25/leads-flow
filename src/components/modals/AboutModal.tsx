@@ -5,7 +5,6 @@ import {
   X, 
   Sparkles, 
   Smartphone, 
-  DollarSign, 
   Heart,
   MessageSquare,
   ArrowUpRight,
@@ -14,7 +13,12 @@ import {
   FileText
 } from 'lucide-react';
 
-export default function AboutModal({ isOpen, onClose }) {
+interface AboutModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
   const { leads, stats } = useLeads();
 
   const developerPhone = '60135928812';

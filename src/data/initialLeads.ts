@@ -1,15 +1,17 @@
-export const MAX_MOCKUP_LEADS = 15;
+import { Lead, StageConfig, PriorityConfig, QuickTemplate } from '../types';
 
-export const STAGES = [
-  { id: 'new', label: 'New Leads', color: 'blue', description: 'Fresh inquiries from ads/website' },
-  { id: 'contacted', label: 'Contacted', color: 'amber', description: 'First touchpoint completed' },
-  { id: 'qualified', label: 'Qualified', color: 'indigo', description: 'BANT qualification criteria verified' },
-  { id: 'proposal_sent', label: 'Proposal Sent', color: 'purple', description: 'Quotation / deck delivered' },
-  { id: 'won', label: 'Closed Won', color: 'emerald', description: 'Deal converted / deposit paid' },
-  { id: 'lost', label: 'Closed Lost', color: 'rose', description: 'Deal lost / archived' },
+export const MAX_MOCKUP_LEADS: number = 15;
+
+export const STAGES: StageConfig[] = [
+  { id: 'new', label: 'New Leads', color: 'blue', bgLight: 'bg-blue-50', bgDark: 'dark:bg-blue-950/40', borderLight: 'border-blue-200', borderDark: 'dark:border-blue-800' },
+  { id: 'contacted', label: 'Contacted', color: 'amber', bgLight: 'bg-amber-50', bgDark: 'dark:bg-amber-950/40', borderLight: 'border-amber-200', borderDark: 'dark:border-amber-800' },
+  { id: 'qualified', label: 'Qualified', color: 'indigo', bgLight: 'bg-indigo-50', bgDark: 'dark:bg-indigo-950/40', borderLight: 'border-indigo-200', borderDark: 'dark:border-indigo-800' },
+  { id: 'proposal_sent', label: 'Proposal Sent', color: 'purple', bgLight: 'bg-purple-50', bgDark: 'dark:bg-purple-950/40', borderLight: 'border-purple-200', borderDark: 'dark:border-purple-800' },
+  { id: 'won', label: 'Closed Won', color: 'emerald', bgLight: 'bg-emerald-50', bgDark: 'dark:bg-emerald-950/40', borderLight: 'border-emerald-200', borderDark: 'dark:border-emerald-800' },
+  { id: 'lost', label: 'Closed Lost', color: 'rose', bgLight: 'bg-rose-50', bgDark: 'dark:bg-rose-950/40', borderLight: 'border-rose-200', borderDark: 'dark:border-rose-800' },
 ];
 
-export const SOURCES = [
+export const SOURCES: string[] = [
   'Meta Ads',
   'TikTok Ads',
   'Website Form',
@@ -18,14 +20,14 @@ export const SOURCES = [
   'Referral / Partner',
 ];
 
-export const PRIORITIES = [
-  { id: 'urgent', label: 'Urgent', color: 'rose' },
-  { id: 'high', label: 'High', color: 'amber' },
-  { id: 'medium', label: 'Medium', color: 'blue' },
-  { id: 'low', label: 'Low', color: 'zinc' },
+export const PRIORITIES: PriorityConfig[] = [
+  { id: 'urgent', label: 'Urgent', color: 'rose', bgLight: 'bg-rose-50', bgDark: 'dark:bg-rose-950/50', borderLight: 'border-rose-200', borderDark: 'dark:border-rose-800' },
+  { id: 'high', label: 'High', color: 'amber', bgLight: 'bg-amber-50', bgDark: 'dark:bg-amber-950/50', borderLight: 'border-amber-200', borderDark: 'dark:border-amber-800' },
+  { id: 'medium', label: 'Medium', color: 'blue', bgLight: 'bg-blue-50', bgDark: 'dark:bg-blue-950/50', borderLight: 'border-blue-200', borderDark: 'dark:border-blue-800' },
+  { id: 'low', label: 'Low', color: 'zinc', bgLight: 'bg-zinc-100', bgDark: 'dark:bg-zinc-800', borderLight: 'border-zinc-200', borderDark: 'dark:border-zinc-700' },
 ];
 
-export const LOST_REASONS = [
+export const LOST_REASONS: string[] = [
   'Price Above Budget',
   'Chose Competitor',
   'Ghosted / Unresponsive (Blue Ticked)',
@@ -34,7 +36,7 @@ export const LOST_REASONS = [
   'No Authority to Buy (Pending Board Approval)',
 ];
 
-export const SAMPLE_LEADS = [
+export const SAMPLE_LEADS: Lead[] = [
   {
     id: 'lead-101',
     name: "Dato' Sri Azman Harun",
@@ -47,16 +49,13 @@ export const SAMPLE_LEADS = [
     source: 'Meta Ads',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    tags: ['Enterprise', 'B2B Logistics', 'Annual Retainer'],
     notes: 'Requires a custom dispatch tracking workflow for 40 container trucks and automated WhatsApp broadcast alerts to driver vendors.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Approved budget RM30,000. Target phase 1 launch before Q4.'
+      timeline: true
     },
     quotations: [
       {
@@ -93,7 +92,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-102',
@@ -107,16 +107,13 @@ export const SAMPLE_LEADS = [
     source: 'TikTok Ads',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['MedSpa Clinic', 'TikTok VIP', 'WhatsApp Auto-Reminder'],
     notes: 'Wants automated WhatsApp appointment reminders to handle 150+ daily inquiries from viral TikTok Ads video campaigns.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Interested in Growth Tier + Official WhatsApp Business API setup.'
+      timeline: true
     },
     quotations: [
       {
@@ -145,7 +142,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-103',
@@ -159,16 +157,13 @@ export const SAMPLE_LEADS = [
     source: 'Website Form',
     assignedTo: 'Unassigned',
     createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-    lastContactedAt: null,
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['Healthcare', 'Website Inbound'],
     notes: 'Website Form Inquiry: "Looking for automated appointment reminders & patient recall CRM for our 3 dental clinics in Bangsar and Subang."',
     bant: {
       budget: false,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Specific budget cap not yet confirmed.'
+      timeline: true
     },
     quotations: [],
     invoices: [],
@@ -181,7 +176,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 25 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-104',
@@ -195,16 +191,13 @@ export const SAMPLE_LEADS = [
     source: 'Direct WhatsApp',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    tags: ['F&B Chain', 'Loyalty Membership'],
     notes: 'Inquired about centralized customer loyalty points & VIP guest messaging for 8 restaurant outlets across Klang Valley.',
     bant: {
       budget: true,
       authority: false,
       need: true,
-      timeline: false,
-      notes: 'En. Faizal is Operations Manager; needs to present proposal at upcoming Board meeting.'
+      timeline: false
     },
     quotations: [
       {
@@ -233,7 +226,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-105',
@@ -247,16 +241,13 @@ export const SAMPLE_LEADS = [
     source: 'Referral / Partner',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    nextFollowUpDate: null,
-    tags: ['Client Closed', 'High-Ticket', 'Interior Design'],
+    nextFollowUpDate: undefined,
     notes: 'Custom Enterprise CRM & Sales Dashboard implementation for luxury residential renovations in Kuala Lumpur.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Agreement signed. 50% upfront deposit received (RM16,000).'
+      timeline: true
     },
     quotations: [
       {
@@ -301,7 +292,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-106',
@@ -315,16 +307,13 @@ export const SAMPLE_LEADS = [
     source: 'Google Search',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    nextFollowUpDate: null,
-    tags: ['Hardware', 'B2B Wholesale'],
+    nextFollowUpDate: undefined,
     notes: 'Only looking for a simple free Excel spreadsheet template rather than a full cloud-based CRM.',
     bant: {
       budget: false,
       authority: true,
       need: false,
-      timeline: false,
-      notes: 'Budget was capped at a one-off RM200 purchase.'
+      timeline: false
     },
     quotations: [
       {
@@ -352,7 +341,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: 'Price Above Budget'
+    lostReason: 'Price Above Budget',
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-107',
@@ -366,16 +356,13 @@ export const SAMPLE_LEADS = [
     source: 'Meta Ads',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    tags: ['Retail F&B', 'Raya Campaign', 'VIP WhatsApp'],
     notes: 'Needs CRM to manage 500+ wholesale seasonal orders from stockists and agents across West & East Malaysia.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Strong interest in automated invoice generation and order parcel tracking status dispatch.'
+      timeline: true
     },
     quotations: [
       {
@@ -404,7 +391,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-108',
@@ -418,16 +406,13 @@ export const SAMPLE_LEADS = [
     source: 'TikTok Ads',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    tags: ['EdTech', 'Masterclass', 'Webinar'],
     notes: 'Requires instant round-robin lead routing across 5 sales closers following weekly live business masterclasses.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Scheduled live demonstration for automated lead routing assignment.'
+      timeline: true
     },
     quotations: [
       {
@@ -456,7 +441,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-109',
@@ -470,16 +456,13 @@ export const SAMPLE_LEADS = [
     source: 'Referral / Partner',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['Hospitality', 'Enterprise Tier', 'VIP High-Ticket'],
     notes: 'Wants multi-property guest loyalty CRM and automated WhatsApp check-in notification system for 4 resort properties.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'High urgency. Board committee meeting scheduled for this Thursday.'
+      timeline: true
     },
     quotations: [
       {
@@ -508,7 +491,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-110',
@@ -522,16 +506,13 @@ export const SAMPLE_LEADS = [
     source: 'TikTok Ads',
     assignedTo: 'Unassigned',
     createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-    lastContactedAt: null,
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['F&B FMCG', 'TikTok Ads Inbound'],
     notes: 'Inbound Inquiry: "Perlukan sistem tracking pesanan ejen & automated WhatsApp invoice untuk 300+ stokis seluruh Malaysia."',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Inbound form submitted directly via TikTok Ads Lead Gen campaign.'
+      timeline: true
     },
     quotations: [],
     invoices: [],
@@ -544,7 +525,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-111',
@@ -558,16 +540,13 @@ export const SAMPLE_LEADS = [
     source: 'Direct WhatsApp',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    nextFollowUpDate: null,
-    tags: ['Luxury Fashion', 'VIP Client Closed'],
+    nextFollowUpDate: undefined,
     notes: 'Bespoke customer relationship portal for private VIP bridal appointments & bespoke tailor fitting schedule.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Client signed Annual Pro Retainer agreement and cleared initial milestone invoice.'
+      timeline: true
     },
     quotations: [
       {
@@ -612,7 +591,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-112',
@@ -626,16 +606,13 @@ export const SAMPLE_LEADS = [
     source: 'Website Form',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    tags: ['Engineering', 'Project Consulting', 'B2B Tender'],
     notes: 'Civil engineering firm needs project milestone tracker CRM and sub-contractor bid management portal.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Submitted RFP quotation. Reviewing tech compliance specs.'
+      timeline: true
     },
     quotations: [
       {
@@ -664,7 +641,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-113',
@@ -678,16 +656,13 @@ export const SAMPLE_LEADS = [
     source: 'Meta Ads',
     assignedTo: 'Aiman (Sales Lead)',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['Travel & Tour', 'Umrah Agency', 'WhatsApp Automation'],
     notes: 'Inquired about passport collection status tracking & automated WhatsApp reminder broadcasts for 2,000 pilgrims.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Managing Director ready to proceed pending live demo.'
+      timeline: true
     },
     quotations: [
       {
@@ -716,7 +691,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-114',
@@ -730,16 +706,13 @@ export const SAMPLE_LEADS = [
     source: 'Google Search',
     assignedTo: 'Sarah (BD Manager)',
     createdAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
-    lastContactedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    nextFollowUpDate: null,
-    tags: ['HR Tech', 'Recruitment'],
+    nextFollowUpDate: undefined,
     notes: 'Recruitment firm evaluating CRM solutions for headhunter candidate tracking.',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: false,
-      notes: 'Opted for a legacy ATS platform specialized strictly in CV parsing.'
+      timeline: false
     },
     quotations: [
       {
@@ -767,7 +740,8 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: 'Chose Competitor'
+    lostReason: 'Chose Competitor',
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'lead-115',
@@ -781,16 +755,13 @@ export const SAMPLE_LEADS = [
     source: 'Direct WhatsApp',
     assignedTo: 'Unassigned',
     createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    lastContactedAt: null,
     nextFollowUpDate: new Date().toISOString().split('T')[0],
-    tags: ['Automotive', 'Workshop Chain', 'WhatsApp VIP'],
     notes: 'WhatsApp inquiry: "Salam, kami ada 4 bengkel servis kereta di Shah Alam & Klang. Nak tanya pakej auto-reminder servis minyak hitam & tayar."',
     bant: {
       budget: true,
       authority: true,
       need: true,
-      timeline: true,
-      notes: 'Incoming fresh lead via Direct WhatsApp Click-to-Chat.'
+      timeline: true
     },
     quotations: [],
     invoices: [],
@@ -803,11 +774,12 @@ export const SAMPLE_LEADS = [
         timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString()
       }
     ],
-    lostReason: null
+    lostReason: undefined,
+    updatedAt: new Date().toISOString()
   }
 ];
 
-export const QUICK_TEMPLATES = [
+export const QUICK_TEMPLATES: QuickTemplate[] = [
   {
     id: 'intro',
     title: 'Introduction & Greeting (First Contact)',

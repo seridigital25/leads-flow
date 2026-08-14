@@ -1,6 +1,6 @@
 # ⚡ LeadFlow CRM — High-Velocity Lead Management (Malaysia RM Edition)
 
-> **Modern, Zero-Backend, High-Velocity CRM & WhatsApp Sales Pipeline** built with React 19, Vite, and Tailwind CSS v4. Engineered specifically for Malaysian startups, digital marketing agencies (running Meta & TikTok Ads campaigns), and high-growth B2B sales teams.
+> **Modern, Zero-Backend, High-Velocity CRM & WhatsApp Sales Pipeline** built with React 19, TypeScript, Vite, and Tailwind CSS v4. Engineered specifically for Malaysian startups, digital marketing agencies (running Meta & TikTok Ads campaigns), and high-growth B2B sales teams.
 
 <p align="center">
   <img src="public/brand-logo.svg" alt="LeadFlow CRM Brand Logo" width="360" />
@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/sharilm/leads-flow"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg" alt="React 19" /></a>
   <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-8.2-646cff.svg" alt="Vite 8" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg" alt="Tailwind CSS v4" /></a>
@@ -50,12 +51,16 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 * **Malaysian Ringgit (RM)**: All deal values, pipeline stage totals, and revenue metrics are natively formatted in standard Malaysian Ringgit (e.g. `RM 28,500`).
 * **Smart Phone Normalizer**: Automatically normalizes local phone formats (`012-345 6789`, `+6019...`, `011...`, `6012...`) into standard international `wa.me/601...` direct links.
 
-### 2. 📄 Official Quotations & Tax Invoices (A4 Print Isolation)
+### 2. 🔷 Full TypeScript Architecture & Type Safety
+* **Strict Type Checking**: Strict mode (`strict: true`) enabled across all domain models, context providers, utility functions, and components.
+* **Domain Model Typings**: Strongly typed interfaces for `Lead`, `StageId`, `PriorityId`, `Quotation`, `Invoice`, `DocumentItem`, `BANT`, `Activity`, and `Stats`.
+
+### 3. 📄 Official Quotations & Tax Invoices (A4 Print Isolation)
 * **Dynamic Document Builder**: Create itemized quotations (`QT-2026-xxxx`) and invoices (`INV-2026-xxxx`) with custom line items, unit prices, and notes.
 * **Pure A4 Printable Isolation**: Clean print mode that strips away all application UI (navbars, drawers, buttons, backdrops) and outputs ONLY the official document with corporate letterhead, SSM details, Maybank payment info, and digital signatures.
 * **1-Click Stage Automation**: Convert approved quotations to Tax Invoices and automatically advance the lead to *Closed Won*.
 
-### 3. 💬 1-Click WhatsApp Direct Actions (`wa.me`)
+### 4. 💬 1-Click WhatsApp Direct Actions (`wa.me`)
 * **Instant WhatsApp Launcher**: 1-click direct link to open WhatsApp with pre-filled, personalized messages (`{{name}}`, `{{company}}`, `{{dealValue}}`, `{{agent}}`).
 * **5 High-Converting Sales Templates**:
   - 🌟 **Introduction & Greeting (First Contact)**: Warm inbound touchpoint following ad inquiries.
@@ -64,28 +69,28 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
   - 🎁 **Limited-Time Incentive / Closing Offer**: Discount & free month onboarding urgency trigger.
   - 🔔 **Gentle Follow-Up / Ghosting Recovery**: Soft nudge for uncontacted / blue-ticked prospects.
 
-### 4. 🗂️ Interactive Kanban Pipeline (Drag & Drop)
+### 5. 🗂️ Interactive Kanban Pipeline (Drag & Drop)
 * **Visual Pipeline Stages**: `New Leads` ➔ `Contacted` ➔ `Qualified` ➔ `Proposal Sent` ➔ `Closed Won` / `Closed Lost`.
 * **Native Drag & Drop**: Smooth column-to-column lead transitions with visual drop-zone feedback.
 * **Real-Time Column Totals**: Live calculation of active deal counts and aggregate RM value per stage.
 
-### 5. 📋 Table View with Multi-Attribute Filtering & Sorting
+### 6. 📋 Table View with Multi-Attribute Filtering & Sorting
 * **Global Search**: Search across lead names, companies, phone numbers, notes, and tags simultaneously.
 * **Granular Filtering**: Filter by marketing channel (`Meta Ads`, `TikTok Ads`, `Website Form`, `Direct WhatsApp`, etc.) and priority (`Urgent`, `High`, `Medium`, `Low`).
 * **Dynamic Sorting**: Sort by `Newest First`, `Value: High to Low`, `Value: Low to High`, `Follow-up Date`, or `Name (A-Z)`.
 
-### 6. 📑 Slide-Over Lead Drawer & Activity Logger
+### 7. 📑 Slide-Over Lead Drawer & Activity Logger
 * **Inline Profile Editing**: Update prospect name, company, phone, email, and deal value in place.
 * **BANT Qualification Checklist**: Verify **Budget**, **Authority**, **Need**, and **Timeline** before formal quoting.
 * **Smart Follow-Up Scheduler**: Quick date picker with shortcut buttons (`Today`, `Tomorrow`, `+3 Days`, `+1 Week`) and visual overdue badges.
 * **Multi-Channel Activity Timeline**: Log and timestamp interactions categorized by `WhatsApp`, `Phone Call`, `Meeting`, or `Sales Note`.
 
-### 7. 📊 Conversion Funnel & Ad Channel Analytics
+### 8. 📊 Conversion Funnel & Ad Channel Analytics
 * **Lead Progression Funnel**: Top-to-bottom visual drop-off analysis across pipeline stages.
 * **Channel Attribution & Revenue**: Track lead volume and revenue contribution per ad source (*Meta Ads, TikTok Ads, Website Form, Direct WhatsApp, Google Search, Referrals*).
 * **Deal Loss Reason Taxonomy**: Analyze why prospects didn't buy (*Price Above Budget, Competitor, Ghosted/Blue Ticked, Poor Fit, Postponed/Next Quarter*).
 
-### 8. 🛡️ Enterprise-Grade Security Headers
+### 9. 🛡️ Enterprise-Grade Security Headers
 * Hardened with enterprise security headers across development and all deployment targets:
   - **`Content-Security-Policy (CSP)`**: Restricts unauthorized script injection, inline execution, and resource framing.
   - **`Strict-Transport-Security (HSTS)`**: Enforces HTTPS with `max-age=63072000; includeSubDomains; preload`.
@@ -95,19 +100,19 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
   - **`Cross-Origin-Opener-Policy (COOP)`**: `same-origin-allow-popups` ensures secure WhatsApp popup dispatching.
 * **Pre-configured configs provided**: `vercel.json`, `netlify.toml`, `public/_headers`, and `vite.config.js`.
 
-### 9. 🔒 Source Code Protection & Deep Obfuscation
+### 10. 🔒 Source Code Protection & Deep Obfuscation
 * **Production Code Obfuscation**: Production JS chunks are transformed using `javascript-obfuscator` (hexadecimal identifier mangling, string array encryption with RC4/Base64, control-flow flattening, dead code injection, and self-defending heuristics).
-* **Disabled Source Maps**: `sourcemap: false` prevents original JSX/TypeScript source exposure.
+* **Disabled Source Maps**: `sourcemap: false` prevents original source exposure.
 * **Anti-Tamper & Inspection Guard**: Intercepts common DevTools shortcuts (`F12`, `Ctrl+Shift+I`, `Ctrl+Shift+J`, `Ctrl+U`, `Ctrl+S`), disables non-form context menus, and outputs an IP copyright notice in the browser console.
 
-### 10. ⚡ Live Inbound Webhook Simulator
+### 11. ⚡ Live Inbound Webhook Simulator
 * Click the **"⚡ Simulate Lead"** button to simulate instant incoming webhook leads from live TikTok Ads and Meta campaigns.
 
-### 11. 🌓 Theme Support (Dark / Light Mode)
+### 12. 🌓 Theme Support (Dark / Light Mode)
 * Native dark and light mode powered by Tailwind CSS v4 custom variant (`@custom-variant dark (&:where(.dark, .dark *));`).
 * Persisted to `localStorage` with an anti-flicker head script to prevent flash during page reload.
 
-### 12. 💾 100% Client-Side Resilience & Data Portability
+### 13. 💾 100% Client-Side Resilience & Data Portability
 * Zero external database required—everything syncs to browser `localStorage`.
 * **Export Leads (JSON)**: Download your entire lead database as a structured JSON backup.
 * **Reset Sample Data**: Restore the default Malaysian sample dataset at any time.
@@ -120,6 +125,8 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 leadflow-crm/
 ├── index.html                     # HTML entry point with security meta tags & anti-flash theme script
 ├── package.json                   # Project metadata, dependencies, and scripts
+├── tsconfig.json                  # TypeScript compiler configuration
+├── tsconfig.node.json             # TypeScript config for node/bundler configs
 ├── vite.config.js                 # Vite config with deep obfuscation plugin, Terser, and security headers
 ├── vercel.json                    # Vercel deployment configuration with enterprise security headers & SPA rewrites
 ├── netlify.toml                   # Netlify deployment configuration & security headers
@@ -128,40 +135,43 @@ leadflow-crm/
 │   ├── favicon.svg                # LeadFlow brand mark vector favicon
 │   └── brand-logo.svg             # LeadFlow horizontal vector brand lockup
 └── src/
-    ├── main.jsx                   # React root mount & security guard initializer
-    ├── App.jsx                    # Core CRM app layout & view switcher
+    ├── main.tsx                   # React root mount & security guard initializer
+    ├── App.tsx                    # Core CRM app layout & view switcher
     ├── index.css                  # Global styles, Tailwind v4 imports, custom variants, and A4 print rules
+    ├── vite-env.d.ts              # Vite client types reference
+    ├── types/
+    │   └── index.ts               # Domain models, entities, and Context interfaces
     ├── components/
     │   ├── common/
-    │   │   ├── BrandLogo.jsx      # Reusable vector brand logo & icon components
-    │   │   ├── PocContactBanner.jsx # Floating POC developer contact widget
-    │   │   └── Toast.jsx          # Notification toast container
+    │   │   ├── BrandLogo.tsx      # Reusable vector brand logo & icon components
+    │   │   ├── PocContactBanner.tsx # Floating POC developer contact widget
+    │   │   └── Toast.tsx          # Notification toast container
     │   ├── layout/
-    │   │   ├── Navbar.jsx         # Navigation bar, view tabs, theme toggle, and data menu
-    │   │   ├── MetricsBar.jsx     # Top KPI summary cards (Pipeline, Won, Follow-ups, Speed to Lead)
-    │   │   └── FilterToolbar.jsx  # Search bar, source/priority dropdowns, and sorting controls
+    │   │   ├── Navbar.tsx         # Navigation bar, view tabs, theme toggle, and data menu
+    │   │   ├── MetricsBar.tsx     # Top KPI summary cards (Pipeline, Won, Follow-ups, Speed to Lead)
+    │   │   └── FilterToolbar.tsx  # Search bar, source/priority dropdowns, and sorting controls
     │   ├── kanban/
-    │   │   ├── KanbanBoard.jsx    # Drag-and-drop Kanban columns
-    │   │   └── LeadCard.jsx       # Individual draggable lead cards with 1-click WhatsApp/Call
+    │   │   ├── KanbanBoard.tsx    # Drag-and-drop Kanban columns
+    │   │   └── LeadCard.tsx       # Individual draggable lead cards with 1-click WhatsApp/Call
     │   ├── table/
-    │   │   └── LeadsTableView.jsx # Tabular lead view with inline stage changers
+    │   │   └── LeadsTableView.tsx # Tabular lead view with inline stage changers
     │   ├── analytics/
-    │   │   └── AnalyticsView.jsx  # Funnel progression, source attribution, and loss taxonomy
+    │   │   └── AnalyticsView.tsx  # Funnel progression, source attribution, and loss taxonomy
     │   ├── drawer/
-    │   │   └── LeadDetailDrawer.jsx # Slide-over inspection drawer, BANT checklist, and documents
+    │   │   └── LeadDetailDrawer.tsx # Slide-over inspection drawer, BANT checklist, and documents
     │   └── modals/
-    │       ├── AboutModal.jsx     # Brand intelligence, system diagnostics, and shortcuts dialog
-    │       ├── AddLeadModal.jsx   # Create lead dialog
-    │       ├── LostReasonModal.jsx # Deal loss categorization dialog
-    │       ├── DocumentPreviewModal.jsx # Isolated A4 printable Quotation & Tax Invoice viewer
-    │       └── CreateDocumentModal.jsx # Custom Quotation & Invoice line-item builder
+    │       ├── AboutModal.tsx     # Brand intelligence, system diagnostics, and shortcuts dialog
+    │       ├── AddLeadModal.tsx   # Create lead dialog
+    │       ├── LostReasonModal.tsx # Deal loss categorization dialog
+    │       ├── DocumentPreviewModal.tsx # Isolated A4 printable Quotation & Tax Invoice viewer
+    │       └── CreateDocumentModal.tsx # Custom Quotation & Invoice line-item builder
     ├── context/
-    │   └── LeadContext.jsx        # Global CRM state management & LocalStorage sync
+    │   └── LeadContext.tsx        # Global CRM state management & LocalStorage sync
     ├── data/
-    │   └── initialLeads.js        # Default 15 Malaysian sample leads, quotations, invoices, and templates
+    │   └── initialLeads.ts        # Default 15 Malaysian sample leads, quotations, invoices, and templates
     └── lib/
-        ├── securityGuard.js       # Client-side anti-tamper, shortcut interceptor & console watermark
-        └── utils.js               # Formatting utilities (RM Currency, Phone Normalizer, Relative Time)
+        ├── securityGuard.ts       # Client-side anti-tamper, shortcut interceptor & console watermark
+        └── utils.ts               # Formatting utilities (RM Currency, Phone Normalizer, Relative Time)
 ```
 
 ---
@@ -177,10 +187,16 @@ git clone https://github.com/sharilm/leads-flow.git
 # 2. Enter directory
 cd leads-flow
 
-# 3. Install dependencies
+# 3. Switch to TypeScript branch
+git checkout feat/typescript-migration
+
+# 4. Install dependencies
 npm install
 
-# 4. Start local development server
+# 5. Type-check codebase
+npm run typecheck
+
+# 6. Start local development server
 npm run dev
 ```
 
@@ -209,6 +225,7 @@ Open your browser and navigate to `http://localhost:5173`.
 
 ## 🧰 Tech Stack
 
+* **Language**: [TypeScript](https://www.typescriptlang.org/)
 * **Core Framework**: [React 19](https://react.dev/)
 * **Build Tool**: [Vite 8](https://vitejs.dev/)
 * **CSS Framework**: [Tailwind CSS v4](https://tailwindcss.com/) with `@tailwindcss/vite`
