@@ -86,7 +86,7 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 * **Deal Loss Reason Taxonomy**: Analyze why prospects didn't buy (*Price Above Budget, Competitor, Ghosted/Blue Ticked, Poor Fit, Postponed/Next Quarter*).
 
 ### 8. 🛡️ Enterprise-Grade Security Headers
-* Fully hardened with enterprise security headers across development and all deployment targets:
+* Hardened with enterprise security headers across development and all deployment targets:
   - **`Content-Security-Policy (CSP)`**: Restricts unauthorized script injection, inline execution, and resource framing.
   - **`Strict-Transport-Security (HSTS)`**: Enforces HTTPS with `max-age=63072000; includeSubDomains; preload`.
   - **`X-Frame-Options: DENY`**: Protects against clickjacking.
@@ -95,14 +95,19 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
   - **`Cross-Origin-Opener-Policy (COOP)`**: `same-origin-allow-popups` ensures secure WhatsApp popup dispatching.
 * **Pre-configured configs provided**: `vercel.json`, `netlify.toml`, `public/_headers`, and `vite.config.js`.
 
-### 9. ⚡ Live Inbound Webhook Simulator
+### 9. 🔒 Source Code Protection & Deep Obfuscation
+* **Production Code Obfuscation**: Production JS chunks are transformed using `javascript-obfuscator` (hexadecimal identifier mangling, string array encryption with RC4/Base64, control-flow flattening, dead code injection, and self-defending heuristics).
+* **Disabled Source Maps**: `sourcemap: false` prevents original JSX/TypeScript source exposure.
+* **Anti-Tamper & Inspection Guard**: Intercepts common DevTools shortcuts (`F12`, `Ctrl+Shift+I`, `Ctrl+Shift+J`, `Ctrl+U`, `Ctrl+S`), disables non-form context menus, and outputs an IP copyright notice in the browser console.
+
+### 10. ⚡ Live Inbound Webhook Simulator
 * Click the **"⚡ Simulate Lead"** button to simulate instant incoming webhook leads from live TikTok Ads and Meta campaigns.
 
-### 10. 🌓 Theme Support (Dark / Light Mode)
+### 11. 🌓 Theme Support (Dark / Light Mode)
 * Native dark and light mode powered by Tailwind CSS v4 custom variant (`@custom-variant dark (&:where(.dark, .dark *));`).
 * Persisted to `localStorage` with an anti-flicker head script to prevent flash during page reload.
 
-### 11. 💾 100% Client-Side Resilience & Data Portability
+### 12. 💾 100% Client-Side Resilience & Data Portability
 * Zero external database required—everything syncs to browser `localStorage`.
 * **Export Leads (JSON)**: Download your entire lead database as a structured JSON backup.
 * **Reset Sample Data**: Restore the default Malaysian sample dataset at any time.
@@ -115,7 +120,7 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 leadflow-crm/
 ├── index.html                     # HTML entry point with security meta tags & anti-flash theme script
 ├── package.json                   # Project metadata, dependencies, and scripts
-├── vite.config.js                 # Vite bundler configuration with Tailwind CSS v4 and dev security headers
+├── vite.config.js                 # Vite config with deep obfuscation plugin, Terser, and security headers
 ├── vercel.json                    # Vercel deployment configuration with enterprise security headers & SPA rewrites
 ├── netlify.toml                   # Netlify deployment configuration & security headers
 ├── public/
@@ -123,7 +128,7 @@ leadflow-crm/
 │   ├── favicon.svg                # LeadFlow brand mark vector favicon
 │   └── brand-logo.svg             # LeadFlow horizontal vector brand lockup
 └── src/
-    ├── main.jsx                   # React root mount
+    ├── main.jsx                   # React root mount & security guard initializer
     ├── App.jsx                    # Core CRM app layout & view switcher
     ├── index.css                  # Global styles, Tailwind v4 imports, custom variants, and A4 print rules
     ├── components/
@@ -155,6 +160,7 @@ leadflow-crm/
     ├── data/
     │   └── initialLeads.js        # Default 15 Malaysian sample leads, quotations, invoices, and templates
     └── lib/
+        ├── securityGuard.js       # Client-side anti-tamper, shortcut interceptor & console watermark
         └── utils.js               # Formatting utilities (RM Currency, Phone Normalizer, Relative Time)
 ```
 
@@ -206,6 +212,7 @@ Open your browser and navigate to `http://localhost:5173`.
 * **Core Framework**: [React 19](https://react.dev/)
 * **Build Tool**: [Vite 8](https://vitejs.dev/)
 * **CSS Framework**: [Tailwind CSS v4](https://tailwindcss.com/) with `@tailwindcss/vite`
+* **Code Obfuscator**: [javascript-obfuscator](https://github.com/javascript-obfuscator/javascript-obfuscator) & [Terser](https://terser.org/)
 * **Typography**: [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) & JetBrains Mono (Google Fonts)
 * **Icon Set**: [Lucide React](https://lucide.dev/)
 * **State & Persistence**: React Context API + Browser `localStorage` API
