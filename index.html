@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" class="h-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeadFlow CRM — High-Velocity Lead Management (Malaysia RM Edition)</title>
+    <meta name="description" content="Capture fast. Close faster. Clean, interactive, zero-backend lead management and WhatsApp sales CRM for Malaysian businesses and modern sales teams." />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+    <!-- OpenGraph & Social Metadata -->
+    <meta property="og:title" content="LeadFlow CRM — High-Velocity WhatsApp Pipeline" />
+    <meta property="og:description" content="Zero-backend, instant WhatsApp closing CRM tailored for Malaysian businesses and growth marketing teams." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/brand-logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LeadFlow CRM (Malaysia RM Edition)" />
+    <meta name="twitter:description" content="Capture fast. Close faster. The high-velocity WhatsApp sales pipeline." />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('leadflow_crm_dark_v1');
+          var isDark = saved !== null ? saved === 'true' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="h-full overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 selection:bg-emerald-500 selection:text-white dark:selection:bg-emerald-400 dark:selection:text-zinc-950">
+    <div id="root" class="h-full"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

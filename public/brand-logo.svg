@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" fill="none">
+  <!-- Brand Icon -->
+  <rect width="64" height="64" rx="16" fill="#09090b" />
+  <rect width="64" height="64" rx="16" stroke="#27272a" stroke-width="2" />
+  
+  <defs>
+    <linearGradient id="brandEmerald" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34d399" />
+      <stop offset="0.5" stop-color="#10b981" />
+      <stop offset="1" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <path 
+    d="M14 14H38C44.6274 14 50 19.3726 50 26V26C50 32.6274 44.6274 38 38 38H18" 
+    stroke="url(#brandEmerald)" 
+    stroke-width="5" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+
+  <path 
+    d="M26 28L16 38L26 48" 
+    stroke="url(#brandEmerald)" 
+    stroke-width="5" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+
+  <circle cx="44" cy="48" r="5" fill="#34d399" />
+
+  <!-- Brand Typography -->
+  <text x="80" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="24" font-weight="800" fill="#09090b">
+    Lead<tspan fill="#10b981">Flow</tspan>
+  </text>
+  <rect x="185" y="22" width="46" height="20" rx="6" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1" />
+  <text x="208" y="36" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#047857" text-anchor="middle">
+    CRM
+  </text>
+</svg>
