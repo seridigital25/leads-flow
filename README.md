@@ -26,7 +26,8 @@
 
 This project is an interactive **Proof of Concept (POC)** prototype developed by **Sharil**.
 
-* 🌐 **Live Production URL**: [https://myleads-flow.vercel.app/](https://myleads-flow.vercel.app/)
+* 🌐 **Sales Landing Page (Homepage)**: [https://myleads-flow.vercel.app/](https://myleads-flow.vercel.app/)
+* 🧪 **Live Interactive Demo (CRM App)**: [https://myleads-flow.vercel.app/demo](https://myleads-flow.vercel.app/demo)
 * 📖 **Panduan Lengkap SEO & Google Indexing**: [docs/PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md](docs/PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md)
 
 If you or your business are interested in:
@@ -49,6 +50,15 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 * **Surface Neutral Palette**: `Onyx & Slate Zinc (#09090b / #18181b / #27272a)` — high-contrast readability in both Dark and Light modes.
 * **Typography**: [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) for ultra-legible UI labels & JetBrains Mono for monetary figures (`RM 28,500`) and IDs.
 * **Aesthetics**: Strictly crafted with clean Zinc/Neutral borders, subtle shadows, zero neon clichés, and full responsive fluidity.
+
+---
+
+## 🧭 Site Structure: Landing Page vs. Live Demo
+
+The app renders one of two experiences based on the URL path (simple pathname check in `src/App.tsx`, no router dependency):
+
+* **`/` — Sales Landing Page** (`src/pages/Landing.tsx`): Conversion-focused marketing page — hero, problem/solution, feature grid, pricing tiers (RM 99 / RM 249 / RM 499), industry use-cases, comparison table, FAQ, and WhatsApp CTAs. This is the homepage and the page indexed by Google.
+* **`/demo` — Interactive CRM Prototype**: The full Kanban/Table/Analytics application described below, for prospects to try hands-on.
 
 ---
 
@@ -164,10 +174,12 @@ leadflow-crm/
 │   └── googlee7e80d636d6f56dd.html# Google Search Console HTML verification file
 └── src/
     ├── main.tsx                   # React root mount & security guard initializer
-    ├── App.tsx                    # Core CRM app layout, dynamic SEO title & view switcher
+    ├── App.tsx                    # Pathname router (/ → Landing, /demo → CRM app), dynamic SEO title & view switcher
     ├── index.css                  # Global styles, Tailwind v4 imports, custom variants, and A4 print rules
     ├── types/
     │   └── index.ts               # Domain types for Leads, BANT, Documents, Stages, and Stats
+    ├── pages/
+    │   └── Landing.tsx            # Sales landing page (hero, pricing, FAQ, industries) served at "/"
     ├── components/
     │   ├── common/
     │   │   ├── BrandLogo.tsx      # SVG vector brand mark with live glow effects
@@ -224,7 +236,7 @@ npm run typecheck
 npm run dev
 ```
 
-Open your browser and navigate to `http://localhost:5173`.
+Open your browser and navigate to `http://localhost:5173` for the sales landing page, or `http://localhost:5173/demo` for the interactive CRM app.
 
 ---
 
