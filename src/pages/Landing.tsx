@@ -410,14 +410,7 @@ export default function Landing() {
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
               <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Tiada kad kredit diperlukan</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> 100% Data Peribadi Anda</span>
-              <a
-                href={HERO_WA}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:underline"
-              >
-                <MessageSquare className="w-4 h-4" /> Atau WhatsApp terus
-              </a>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> RM Native</span>
             </div>
           </div>
 
