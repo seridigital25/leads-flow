@@ -70,7 +70,7 @@ export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }
       <header className="h-14 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xs px-4 flex items-center justify-between shrink-0 select-none z-20 transition-colors">
         {/* Brand & Workspace */}
         <div className="flex items-center gap-4 sm:gap-6">
-          <BrandLogo size="md" onClick={() => setAboutModalOpen(true)} />
+          <BrandLogo size="md" onClick={() => { window.location.href = '/'; }} />
 
           {/* View Tabs */}
           <nav className="hidden md:flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-medium">
