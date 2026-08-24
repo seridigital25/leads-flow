@@ -60,7 +60,13 @@ export default defineConfig({
     codeObfuscatorPlugin()
   ],
   server: {
-    headers: securityHeaders
+    headers: securityHeaders,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true
+      }
+    }
   },
   preview: {
     headers: securityHeaders

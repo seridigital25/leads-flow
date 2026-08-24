@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { BrandIcon } from '../common/BrandLogo';
 import { 
-  X, 
-  Sparkles, 
-  Smartphone, 
+  X,
+  Sparkles,
+  Smartphone,
   Heart,
-  MessageSquare, 
-  ArrowUpRight, 
-  ShieldCheck, 
-  Zap, 
+  MessageSquare,
+  ClipboardList,
+  ShieldCheck,
+  Zap,
   FileText,
   HelpCircle,
   BarChart3,
@@ -20,9 +20,10 @@ import {
 interface AboutModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onRequestDemo?: () => void;
 }
 
-export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
+export default function AboutModal({ isOpen, onClose, onRequestDemo }: AboutModalProps) {
   const { leads, stats } = useLeads();
   const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'faq'>('overview');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -151,15 +152,23 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                   Ini adalah prototaip <strong>Proof of Concept (POC)</strong> interaktif. Jika anda ingin membina sistem CRM khas dengan integrasi automatik iklan Meta / TikTok Ads, WhatsApp chatbot, sistem komisen sales, atau SaaS dashboard tersuai:
                 </p>
 
+                <button
+                  onClick={() => {
+                    onClose();
+                    onRequestDemo?.();
+                  }}
+                  className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer hover:scale-[1.01]"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  <span>Isi Request Demo</span>
+                </button>
                 <a
                   href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer hover:scale-[1.01]"
+                  className="text-[11px] text-center text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center justify-center gap-1"
                 >
-                  <MessageSquare className="w-4 h-4 fill-white" />
-                  <span>Hubungi Sharil melalui WhatsApp (+60135928812)</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 opacity-90" />
+                  <MessageSquare className="w-3 h-3" /> Atau hubungi Sharil melalui WhatsApp
                 </a>
               </div>
 
