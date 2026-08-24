@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { LeadProvider, useLeads } from './context/LeadContext';
+import Landing from './pages/Landing';
 import Navbar from './components/layout/Navbar';
 import MetricsBar from './components/layout/MetricsBar';
 import FilterToolbar from './components/layout/FilterToolbar';
@@ -68,6 +69,12 @@ function CRMContent() {
 }
 
 export default function App() {
+  const isDemo = typeof window !== 'undefined' && window.location.pathname.startsWith('/demo');
+
+  if (!isDemo) {
+    return <Landing />;
+  }
+
   return (
     <LeadProvider>
       <CRMContent />

@@ -16,4 +16,10 @@
       <image:title>LeadFlow CRM Logo</image:title>
     </image:image>
   </url>
+  <url>
+    <loc>https://myleads-flow.vercel.app/demo</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
