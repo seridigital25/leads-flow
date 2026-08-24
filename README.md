@@ -1,6 +1,6 @@
 # ⚡ LeadFlow CRM — High-Velocity Lead Management (Malaysia RM Edition)
 
-> **Modern, Zero-Backend, High-Velocity CRM & WhatsApp Sales Pipeline** built with React 19, TypeScript, Vite, and Tailwind CSS v4. Engineered specifically for Malaysian startups, digital marketing agencies (running Meta & TikTok Ads campaigns), and high-growth B2B sales teams.
+> **High-Velocity CRM & WhatsApp Sales Pipeline** built with React 19, TypeScript, Vite, and Tailwind CSS v4. Engineered specifically for Malaysian startups, digital marketing agencies (running Meta & TikTok Ads campaigns), and high-growth B2B sales teams. The public sales page and `/demo` sandbox are zero-backend (LocalStorage only); the private `/owner` CRM module is backed by a real Neon Postgres database via Vercel Serverless Functions.
 
 <p align="center">
   <img src="public/brand-logo.svg" alt="LeadFlow CRM Brand Logo" width="360" />
@@ -16,7 +16,7 @@
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg" alt="React 19" /></a>
   <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-8.2-646cff.svg" alt="Vite 8" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg" alt="Tailwind CSS v4" /></a>
-  <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage"><img src="https://img.shields.io/badge/Storage-100%25_Client--Side-10b981.svg" alt="Client-side LocalStorage" /></a>
+  <a href="https://neon.tech"><img src="https://img.shields.io/badge/Storage-LocalStorage_Demo_%2B_Neon_Owner_CRM-10b981.svg" alt="LocalStorage demo plus Neon-backed Owner CRM" /></a>
   <a href="https://wa.me/60135928812"><img src="https://img.shields.io/badge/WhatsApp-Contact_Developer-25D366?logo=whatsapp&logoColor=white" alt="WhatsApp Developer" /></a>
 </p>
 
@@ -53,12 +53,13 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 
 ---
 
-## 🧭 Site Structure: Landing Page vs. Live Demo
+## 🧭 Site Structure: Landing Page, Live Demo & Owner CRM
 
-The app renders one of two experiences based on the URL path (simple pathname check in `src/App.tsx`, no router dependency):
+The app renders one of three experiences based on the URL path (simple pathname check in `src/App.tsx`, no router dependency):
 
-* **`/` — Sales Landing Page** (`src/pages/Landing.tsx`): Conversion-focused marketing page — hero, problem/solution, feature grid, pricing tiers (RM 99 / RM 249 / RM 499), industry use-cases, comparison table, FAQ, and WhatsApp CTAs. This is the homepage and the page indexed by Google.
-* **`/demo` — Interactive CRM Prototype**: The full Kanban/Table/Analytics application described below, for prospects to try hands-on.
+* **`/` — Sales Landing Page** (`src/pages/Landing.tsx`): Conversion-focused marketing page — hero, problem/solution, feature grid, pricing tiers (RM 99 / RM 249 / RM 499), industry use-cases, comparison table, FAQ, and a **Request Demo** form. This is the homepage and the page indexed by Google.
+* **`/demo` — Interactive CRM Prototype**: The full Kanban/Table/Analytics application described below, running entirely on LocalStorage sample data, for prospects to try hands-on without signing up.
+* **`/owner` — Private Owner CRM** (`src/pages/Owner.tsx`): Password-gated, same Kanban/Table/Analytics UI as `/demo`, but backed by real leads in Neon Postgres. Every `/` Request Demo submission lands directly in its "New Leads" column.
 
 ---
 
@@ -134,10 +135,17 @@ The app renders one of two experiences based on the URL path (simple pathname ch
 * Native dark and light mode powered by Tailwind CSS v4 custom variant (`@custom-variant dark (&:where(.dark, .dark *));`).
 * Persisted to `localStorage` with an anti-flicker head script to prevent flash during page reload.
 
-### 14. 💾 100% Client-Side Resilience & Data Portability
-* Zero external database required—everything syncs to browser `localStorage`.
+### 14. 💾 100% Client-Side Resilience & Data Portability (`/demo` sandbox)
+* The public `/demo` prototype requires zero external database — everything syncs to browser `localStorage`.
 * **Export Leads (JSON)**: Download your entire lead database as a structured JSON backup.
 * **Reset Sample Data**: Restore the default Malaysian sample dataset at any time.
+
+### 15. 📝 Request Demo Form & Private Owner CRM Module
+* **Public Request Demo Form**: Visitors on the landing page submit Name, Company, WhatsApp, Email, and an interest type (*Try Demo / Subscribe / Custom Deal*) directly into a real backend — no localStorage involved.
+* **Server-Enforced Safety**: The public insert endpoint (`POST /api/leads`) always forces `stage: 'new'` and `dealValue: 0` server-side, and clamps priority to a known set — a crafted request can never fake a closed deal.
+* **Owner-Only Access**: `/owner` is gated behind a password login (bcrypt-hashed, signed httpOnly JWT cookie) — only Sharil can view or manage real leads.
+* **Same CRM, Real Data**: `/owner` reuses the exact same Kanban/Table/Analytics/Drawer/Modal components as `/demo` via a shared `CRMShell`, so managing real subscribers and custom-deal prospects feels identical to the public prototype.
+* **Backend**: Neon Postgres accessed only from Vercel Serverless Functions under `api/` — the database connection string never reaches the browser bundle.
 
 ---
 
@@ -147,11 +155,27 @@ The app renders one of two experiences based on the URL path (simple pathname ch
 leadflow-crm/
 ├── index.html                     # HTML entry point with SEO metadata, Schema.org JSON-LD & noscript shell
 ├── package.json                   # Project metadata, dependencies, and scripts
-├── tsconfig.json                  # TypeScript compiler configuration
+├── tsconfig.json                  # TypeScript compiler configuration (src/)
+├── tsconfig.api.json              # TypeScript compiler configuration (api/ and scripts/, Node types)
 ├── tsconfig.node.json             # TypeScript config for node/bundler configs
-├── vite.config.js                 # Vite config with deep obfuscation plugin, Terser, and security headers
-├── vercel.json                    # Vercel deployment configuration with static sitemap exceptions & headers
+├── vite.config.js                 # Vite config with deep obfuscation plugin, Terser, security headers & /api dev proxy
+├── vercel.json                    # Vercel deployment configuration with static sitemap exceptions, /api rewrite exclusion & headers
 ├── netlify.toml                   # Netlify deployment configuration & security headers
+├── .env.example                   # Documents DATABASE_URL, JWT_SECRET, OWNER_PASSWORD_HASH (server-only, never in the client bundle)
+├── api/                           # Vercel Serverless Functions — the only code that ever touches the Neon connection string
+│   ├── _lib/
+│   │   ├── db.ts                  # Neon client (@neondatabase/serverless)
+│   │   ├── auth.ts                # Signed JWT cookie issue/verify + Owner auth guard
+│   │   └── leadMapper.ts          # snake_case DB row ↔ camelCase Lead type mapping
+│   ├── leads.ts                   # GET (owner-only list) / POST (public insert, safe-defaults enforced; owner insert, trusted)
+│   ├── leads/[id].ts              # PATCH / DELETE a single lead (owner-only)
+│   └── owner/
+│       ├── login.ts               # Password check (bcrypt) → issues session cookie
+│       ├── logout.ts              # Clears session cookie
+│       └── session.ts             # Checks current session validity
+├── scripts/
+│   ├── setup-db.mjs               # One-time `leads` table + indexes creation against DATABASE_URL
+│   └── dev-api-server.mjs         # Local esbuild+http server that serves api/* for `npm run dev:api`, proxied from Vite at /api
 ├── docs/
 │   ├── PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md # Complete Google SEO & Search Console configuration guide
 │   ├── BUSINESS_VALUATION_AND_PRICING_GUIDE.md  # Business valuation & SaaS pricing models
@@ -174,19 +198,22 @@ leadflow-crm/
 │   └── googlee7e80d636d6f56dd.html# Google Search Console HTML verification file
 └── src/
     ├── main.tsx                   # React root mount & security guard initializer
-    ├── App.tsx                    # Pathname router (/ → Landing, /demo → CRM app), dynamic SEO title & view switcher
+    ├── App.tsx                    # Pathname router (/ → Landing, /demo → CRM app, /owner → Owner CRM)
     ├── index.css                  # Global styles, Tailwind v4 imports, custom variants, and A4 print rules
     ├── types/
-    │   └── index.ts               # Domain types for Leads, BANT, Documents, Stages, and Stats
+    │   └── index.ts               # Domain types for Leads, BANT, Documents, Stages, Stats & LeadContextType (mode/loading/signOut)
     ├── pages/
-    │   └── Landing.tsx            # Sales landing page (hero, pricing, FAQ, industries) served at "/"
+    │   ├── Landing.tsx            # Sales landing page (hero, pricing, FAQ, industries, Request Demo CTAs) served at "/"
+    │   └── Owner.tsx               # /owner session check → OwnerLogin or authenticated Owner CRM
     ├── components/
+    │   ├── CRMShell.tsx           # Shared Kanban/Table/Analytics shell reused by both /demo and /owner, mode-aware
+    │   ├── OwnerLogin.tsx         # Password login form for the Owner CRM (posts to /api/owner/login)
     │   ├── common/
     │   │   ├── BrandLogo.tsx      # SVG vector brand mark with live glow effects
-    │   │   ├── PocContactBanner.tsx # Floating bottom bar with developer WhatsApp link
+    │   │   ├── PocContactBanner.tsx # Floating bottom bar with developer WhatsApp link (demo mode only)
     │   │   └── Toast.tsx          # Animated notification toasts
     │   ├── layout/
-    │   │   ├── Navbar.tsx         # Navigation bar, view tabs, theme toggle, and data menu
+    │   │   ├── Navbar.tsx         # Navigation bar, view tabs, theme toggle, data menu — mode-aware (demo vs owner)
     │   │   ├── MetricsBar.tsx     # Top KPI summary cards (Pipeline, Won, Follow-ups, Speed to Lead)
     │   │   └── FilterToolbar.tsx  # Search bar, source/priority dropdowns, and sorting controls
     │   ├── kanban/
@@ -203,14 +230,18 @@ leadflow-crm/
     │       ├── AddLeadModal.tsx   # Create lead dialog
     │       ├── LostReasonModal.tsx # Deal loss categorization dialog
     │       ├── DocumentPreviewModal.tsx # Isolated A4 printable Quotation & Tax Invoice viewer
-    │       └── CreateDocumentModal.tsx # Custom Quotation & Invoice line-item builder
+    │       ├── CreateDocumentModal.tsx # Custom Quotation & Invoice line-item builder
+    │       └── RequestDemoModal.tsx # Public Request Demo form on the landing page (posts to /api/leads)
     ├── context/
-    │   └── LeadContext.tsx        # Global CRM state management & LocalStorage sync
+    │   ├── LeadContext.tsx        # Demo CRM state management & LocalStorage sync (mode: 'demo')
+    │   └── OwnerLeadContext.tsx   # Owner CRM state management via ownerApi + Neon (mode: 'owner'), same LeadContextType shape
     ├── data/
     │   └── initialLeads.ts        # Default 15 Malaysian sample leads, quotations, invoices, and templates
     └── lib/
         ├── securityGuard.ts       # Client-side anti-tamper, shortcut interceptor & console watermark
-        └── utils.ts               # Formatting utilities (RM Currency, Phone Normalizer, Relative Time)
+        ├── utils.ts               # Formatting utilities (RM Currency, Phone Normalizer, Relative Time)
+        ├── leadSelectors.ts       # Shared filter/sort/stats logic used by both LeadContext and OwnerLeadContext
+        └── ownerApi.ts            # fetch wrapper for /api/leads* and /api/owner/* (credentials: 'include')
 ```
 
 ---
@@ -238,6 +269,28 @@ npm run dev
 
 Open your browser and navigate to `http://localhost:5173` for the sales landing page, or `http://localhost:5173/demo` for the interactive CRM app.
 
+### Owner CRM Backend Setup (`/owner`)
+
+The `/owner` module and the public Request Demo form need a real database. This is optional for working on the landing page or `/demo` — skip it if you're not touching those.
+
+```bash
+# 1. Create a free Neon Postgres project at https://neon.tech and copy the pooled connection string
+
+# 2. Copy the example env file and fill in the three values
+cp .env.example .env.local
+# DATABASE_URL          — your Neon connection string
+# JWT_SECRET             — generate with: openssl rand -hex 32
+# OWNER_PASSWORD_HASH    — generate with: node -e "console.log(require('bcryptjs').hashSync('your-password', 12))"
+
+# 3. Create the `leads` table (one-time)
+node --env-file=.env.local scripts/setup-db.mjs
+
+# 4. Run the local API dev server (separate terminal from `npm run dev`)
+npm run dev:api
+```
+
+With both `npm run dev` and `npm run dev:api` running, Vite proxies `/api/*` to the local API server (`vite.config.js` → `server.proxy`), so the Request Demo form and `/owner` work fully locally against your real Neon database — no Vercel CLI required.
+
 ---
 
 ## 🚢 Deployment Guide
@@ -245,7 +298,8 @@ Open your browser and navigate to `http://localhost:5173` for the sales landing 
 ### Deploy on Vercel
 1. Push your repository to GitHub.
 2. Import the project into [Vercel](https://vercel.com).
-3. Vercel automatically detects `vercel.json` and applies Vite presets, static file exemptions (`/sitemap.xml`, `/robots.txt`), and security headers.
+3. Vercel automatically detects `vercel.json` and `api/` and applies Vite presets, static file exemptions (`/sitemap.xml`, `/robots.txt`), the `/api` rewrite exclusion, and security headers.
+4. Add `DATABASE_URL`, `JWT_SECRET`, and `OWNER_PASSWORD_HASH` under Project Settings → Environment Variables (Production, Preview, and Development) — required for `/owner` and the Request Demo form to work. Without them the rest of the site (landing page + `/demo`) still works fine.
 
 ---
 
@@ -258,7 +312,8 @@ Open your browser and navigate to `http://localhost:5173` for the sales landing 
 * **Code Obfuscator**: [javascript-obfuscator](https://github.com/javascript-obfuscator/javascript-obfuscator) & [Terser](https://terser.org/)
 * **Typography**: [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) & JetBrains Mono (Google Fonts)
 * **Icon Set**: [Lucide React](https://lucide.dev/)
-* **State & Persistence**: React Context API + Browser `localStorage` API
+* **State & Persistence**: React Context API — `localStorage` for `/demo`, [Neon](https://neon.tech) Postgres for `/owner`
+* **Backend**: [Vercel Serverless Functions](https://vercel.com/docs/functions) (`api/`), [@neondatabase/serverless](https://github.com/neondatabase/serverless), `bcryptjs` + `jsonwebtoken` for Owner auth
 
 ---
 
