@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLeads } from '../context/LeadContext';
 import Navbar from './layout/Navbar';
 import MetricsBar from './layout/MetricsBar';
@@ -11,10 +11,12 @@ import AddLeadModal from './modals/AddLeadModal';
 import LostReasonModal from './modals/LostReasonModal';
 import Toast from './common/Toast';
 import PocContactBanner from './common/PocContactBanner';
+import RequestDemoModal from './modals/RequestDemoModal';
 
 export default function CRMShell() {
   const { mode, loading, viewMode, selectedLead } = useLeads();
   const brandSuffix = mode === 'owner' ? 'LeadFlow Owner CRM' : 'LeadFlow CRM Malaysia';
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
 
   useEffect(() => {
     if (selectedLead) {
@@ -44,7 +46,7 @@ export default function CRMShell() {
       </h1>
 
       {/* Top Navbar */}
-      <Navbar />
+      <Navbar onRequestDemo={mode === 'demo' ? () => setDemoModalOpen(true) : undefined} />
 
       {/* KPI Metrics Summary Bar */}
       <MetricsBar />
@@ -67,7 +69,12 @@ export default function CRMShell() {
       <LostReasonModal />
 
       {/* Floating POC Contact Developer Banner (demo mode only) */}
-      {mode === 'demo' && <PocContactBanner />}
+      {mode === 'demo' && <PocContactBanner onRequestDemo={() => setDemoModalOpen(true)} />}
+
+      {/* Request Demo modal (demo mode only) */}
+      {mode === 'demo' && (
+        <RequestDemoModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
+      )}
 
       {/* Toast Notification Container */}
       <Toast />

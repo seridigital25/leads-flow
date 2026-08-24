@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { MessageSquare, X, ArrowUpRight } from 'lucide-react';
+import { MessageSquare, X, ClipboardList } from 'lucide-react';
 
-export default function PocContactBanner() {
+export default function PocContactBanner({ onRequestDemo }: { onRequestDemo?: () => void }) {
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
 
@@ -63,16 +63,21 @@ export default function PocContactBanner() {
         </p>
 
         {/* Action Button */}
-        <div className="flex items-center gap-2 pt-0.5">
+        <div className="flex flex-col gap-1.5 pt-0.5">
+          <button
+            onClick={onRequestDemo}
+            className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer hover:scale-[1.01]"
+          >
+            <ClipboardList className="w-3.5 h-3.5" />
+            <span>Request Demo</span>
+          </button>
           <a
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer hover:scale-[1.01]"
+            className="text-[11px] text-center text-zinc-400 hover:text-emerald-400 flex items-center justify-center gap-1"
           >
-            <MessageSquare className="w-3.5 h-3.5 fill-white" />
-            <span>Chat with Developer on WhatsApp</span>
-            <ArrowUpRight className="w-3.5 h-3.5 opacity-80" />
+            <MessageSquare className="w-3 h-3" /> Atau WhatsApp terus
           </a>
         </div>
       </div>

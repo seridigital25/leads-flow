@@ -15,11 +15,11 @@ import {
   ChevronDown, 
   Info,
   MessageSquare,
-  ArrowUpRight,
+  ClipboardList,
   LogOut
 } from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }) {
   const {
     mode,
     signOut,
@@ -122,17 +122,14 @@ export default function Navbar() {
               <span>Sign Out</span>
             </button>
           ) : (
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Chat with developer on WhatsApp regarding custom CRM / SaaS solutions"
+            <button
+              onClick={onRequestDemo}
+              title="Isi Request Demo untuk bincang custom CRM / SaaS solutions"
               className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-2xs cursor-pointer hover:scale-[1.02]"
             >
-              <MessageSquare className="w-3.5 h-3.5 fill-white" />
-              <span>Contact Developer</span>
-              <ArrowUpRight className="w-3 h-3 opacity-80" />
-            </a>
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span>Request Demo</span>
+            </button>
           )}
 
           {!isOwner && (
@@ -199,15 +196,26 @@ export default function Navbar() {
                       POC & Developer
                     </div>
 
-                    {/* WhatsApp Link in dropdown */}
+                    {/* Request Demo in dropdown */}
+                    <button
+                      onClick={() => {
+                        onRequestDemo?.();
+                        setMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 flex items-center gap-2 text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors font-semibold cursor-pointer"
+                    >
+                      <ClipboardList className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Request Demo</span>
+                    </button>
+
                     <a
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full text-left px-3 py-2 flex items-center gap-2 text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors font-semibold"
+                      className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
-                      <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>Contact Developer via WhatsApp</span>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Atau WhatsApp terus</span>
                     </a>
 
                     <div className="border-t border-zinc-100 dark:border-zinc-800 my-1" />
@@ -280,7 +288,7 @@ export default function Navbar() {
       </header>
 
       {/* About LeadFlow Modal */}
-      <AboutModal isOpen={aboutModalOpen} onClose={() => setAboutModalOpen(false)} />
+      <AboutModal isOpen={aboutModalOpen} onClose={() => setAboutModalOpen(false)} onRequestDemo={onRequestDemo} />
     </>
   );
 }
