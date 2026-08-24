@@ -391,35 +391,33 @@ export default function Landing() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a
-                href="/demo"
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] cursor-pointer"
-              >
-                Cuba Live Demo Percuma
-                <ArrowRight className="w-4 h-4" />
-              </a>
               <button
                 onClick={() => setDemoModalOpen(true)}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 rounded-xl border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-bold transition-colors cursor-pointer"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] cursor-pointer"
               >
                 <ClipboardList className="w-4 h-4" />
                 Request Demo
               </button>
               <a
-                href={HERO_WA}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/demo"
                 className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:border-emerald-500 font-bold text-zinc-800 dark:text-zinc-100 transition-colors cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4" />
-                Tanya di WhatsApp
+                Cuba Live Demo Percuma
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
 
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
               <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Tiada kad kredit diperlukan</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> 100% Data Peribadi Anda</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> RM Native</span>
+              <a
+                href={HERO_WA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:underline"
+              >
+                <MessageSquare className="w-4 h-4" /> Atau WhatsApp terus
+              </a>
             </div>
           </div>
 
@@ -712,33 +710,32 @@ export default function Landing() {
               Sedia untuk stop kehilangan lead?
             </h2>
             <p className="mt-3 text-zinc-400 max-w-xl mx-auto">
-              Cuba live demo percuma sekarang, atau WhatsApp kami untuk sesi demo 15 minit bersama pasukan anda.
+              Isi Request Demo sekarang, atau cuba live demo percuma tanpa perlu daftar.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="/demo"
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-7 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg transition-all hover:scale-[1.02] cursor-pointer"
-              >
-                Cuba Live Demo Percuma
-                <ArrowRight className="w-4 h-4" />
-              </a>
               <button
                 onClick={() => setDemoModalOpen(true)}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-7 rounded-xl border-2 border-emerald-500 text-emerald-400 hover:bg-emerald-950/40 font-bold transition-colors cursor-pointer"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-7 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg transition-all hover:scale-[1.02] cursor-pointer"
               >
                 <ClipboardList className="w-4 h-4" />
                 Request Demo
               </button>
               <a
-                href={HERO_WA}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/demo"
                 className="min-h-[44px] inline-flex items-center justify-center gap-2 px-7 rounded-xl border border-zinc-700 hover:border-emerald-500 font-bold text-white transition-colors cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4" />
-                WhatsApp Kami
+                Cuba Live Demo Percuma
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
+            <a
+              href={HERO_WA}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-400 hover:text-emerald-400 hover:underline"
+            >
+              <MessageSquare className="w-4 h-4" /> Atau WhatsApp kami terus
+            </a>
           </div>
         </div>
       </section>
