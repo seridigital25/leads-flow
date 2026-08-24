@@ -7,6 +7,10 @@
 </p>
 
 <p align="center">
+  <a href="https://myleads-flow.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-myleads--flow.vercel.app-10b981?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/sharilm/leads-flow"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg" alt="React 19" /></a>
@@ -21,6 +25,9 @@
 ## 👨‍💻 Proof of Concept (POC) & Custom Development
 
 This project is an interactive **Proof of Concept (POC)** prototype developed by **Sharil**.
+
+* 🌐 **Live Production URL**: [https://myleads-flow.vercel.app/](https://myleads-flow.vercel.app/)
+* 📖 **Panduan Lengkap SEO & Google Indexing**: [docs/PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md](docs/PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md)
 
 If you or your business are interested in:
 * Building a **Custom Enterprise CRM / Sales Pipeline** tailored to your workflow.
@@ -90,7 +97,13 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 * **Channel Attribution & Revenue**: Track lead volume and revenue contribution per ad source (*Meta Ads, TikTok Ads, Website Form, Direct WhatsApp, Google Search, Referrals*).
 * **Deal Loss Reason Taxonomy**: Analyze why prospects didn't buy (*Price Above Budget, Competitor, Ghosted/Blue Ticked, Poor Fit, Postponed/Next Quarter*).
 
-### 9. 🛡️ Enterprise-Grade Security Headers
+### 9. 🔍 Full-Spectrum Google SEO & Schema.org Structured Data
+* **Verified Google Indexing**: Live sitemap submitted and verified on Google Search Console (`https://myleads-flow.vercel.app/sitemap.xml`).
+* **Schema.org Rich Snippets**: Integrated `WebApplication`, `FAQPage`, and `Organization` JSON-LD schemas for rich Google search cards.
+* **Google Favicon Standard**: Multiples of 48px square icons (`48x48`, `96x96`, `192x192`, `512x512`, `apple-touch-icon.png`) for instant logo appearance in Google search results.
+* **Social Graph Previews**: High-resolution 1200x630 OpenGraph cards (`og-image.png`) with Ringgit Malaysia branding for WhatsApp and social shares.
+
+### 10. 🛡️ Enterprise-Grade Security Headers
 * Hardened with enterprise security headers across development and all deployment targets:
   - **`Content-Security-Policy (CSP)`**: Restricts unauthorized script injection, inline execution, and resource framing.
   - **`Strict-Transport-Security (HSTS)`**: Enforces HTTPS with `max-age=63072000; includeSubDomains; preload`.
@@ -98,21 +111,20 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
   - **`X-Content-Type-Options: nosniff`**: Prevents MIME-type sniffing.
   - **`Permissions-Policy`**: Restricts unused device hardware APIs (camera, microphone, geolocation).
   - **`Cross-Origin-Opener-Policy (COOP)`**: `same-origin-allow-popups` ensures secure WhatsApp popup dispatching.
-* **Pre-configured configs provided**: `vercel.json`, `netlify.toml`, `public/_headers`, and `vite.config.js`.
 
-### 10. 🔒 Source Code Protection & Deep Obfuscation
+### 11. 🔒 Source Code Protection & Deep Obfuscation
 * **Production Code Obfuscation**: Production JS chunks are transformed using `javascript-obfuscator` (hexadecimal identifier mangling, string array encryption with RC4/Base64, control-flow flattening, dead code injection, and self-defending heuristics).
 * **Disabled Source Maps**: `sourcemap: false` prevents original source exposure.
 * **Anti-Tamper & Inspection Guard**: Intercepts common DevTools shortcuts (`F12`, `Ctrl+Shift+I`, `Ctrl+Shift+J`, `Ctrl+U`, `Ctrl+S`), disables non-form context menus, and outputs an IP copyright notice in the browser console.
 
-### 11. ⚡ Live Inbound Webhook Simulator
+### 12. ⚡ Live Inbound Webhook Simulator
 * Click the **"⚡ Simulate Lead"** button to simulate instant incoming webhook leads from live TikTok Ads and Meta campaigns.
 
-### 12. 🌓 Theme Support (Dark / Light Mode)
+### 13. 🌓 Theme Support (Dark / Light Mode)
 * Native dark and light mode powered by Tailwind CSS v4 custom variant (`@custom-variant dark (&:where(.dark, .dark *));`).
 * Persisted to `localStorage` with an anti-flicker head script to prevent flash during page reload.
 
-### 13. 💾 100% Client-Side Resilience & Data Portability
+### 14. 💾 100% Client-Side Resilience & Data Portability
 * Zero external database required—everything syncs to browser `localStorage`.
 * **Export Leads (JSON)**: Download your entire lead database as a structured JSON backup.
 * **Reset Sample Data**: Restore the default Malaysian sample dataset at any time.
@@ -123,29 +135,44 @@ In high-velocity digital advertising markets like Malaysia (where leads generate
 
 ```
 leadflow-crm/
-├── index.html                     # HTML entry point with security meta tags & anti-flash theme script
+├── index.html                     # HTML entry point with SEO metadata, Schema.org JSON-LD & noscript shell
 ├── package.json                   # Project metadata, dependencies, and scripts
 ├── tsconfig.json                  # TypeScript compiler configuration
 ├── tsconfig.node.json             # TypeScript config for node/bundler configs
 ├── vite.config.js                 # Vite config with deep obfuscation plugin, Terser, and security headers
-├── vercel.json                    # Vercel deployment configuration with enterprise security headers & SPA rewrites
+├── vercel.json                    # Vercel deployment configuration with static sitemap exceptions & headers
 ├── netlify.toml                   # Netlify deployment configuration & security headers
+├── docs/
+│   ├── PANDUAN_SETUP_GOOGLE_SEO_DAN_INDEXING.md # Complete Google SEO & Search Console configuration guide
+│   ├── BUSINESS_VALUATION_AND_PRICING_GUIDE.md  # Business valuation & SaaS pricing models
+│   ├── CLIENT_PROPOSAL_TEMPLATE.md              # Client proposal presentation template
+│   └── SKRIP_PITCH_JUALAN_LENGKAP.md            # WhatsApp closing & live demo pitch scripts
 ├── public/
-│   ├── _headers                   # Cloudflare Pages / Netlify security header rules
-│   ├── favicon.svg                # LeadFlow brand mark vector favicon
-│   └── brand-logo.svg             # LeadFlow horizontal vector brand lockup
+│   ├── robots.txt                 # Search engine crawler directives & sitemap reference
+│   ├── sitemap.xml                # XML Sitemap with image metadata
+│   ├── site.webmanifest           # Web app manifest for PWA & mobile search discovery
+│   ├── og-image.png               # OpenGraph 1200x630 social share banner
+│   ├── og-image.svg               # Vector OpenGraph banner
+│   ├── brand-logo.png             # Official Google Knowledge Graph & Schema logo
+│   ├── brand-logo.svg             # Vector brand lockup
+│   ├── favicon-48x48.png          # Google Search Console standard 48px square icon
+│   ├── favicon-96x96.png          # Desktop SERP 96px icon
+│   ├── favicon-192x192.png        # Mobile Chrome PWA 192px icon
+│   ├── favicon-512x512.png        # High-res 512px icon
+│   ├── apple-touch-icon.png       # Apple iOS home screen icon (180x180 px)
+│   ├── favicon.svg                # Vector browser tab favicon
+│   └── googlee7e80d636d6f56dd.html# Google Search Console HTML verification file
 └── src/
     ├── main.tsx                   # React root mount & security guard initializer
-    ├── App.tsx                    # Core CRM app layout & view switcher
+    ├── App.tsx                    # Core CRM app layout, dynamic SEO title & view switcher
     ├── index.css                  # Global styles, Tailwind v4 imports, custom variants, and A4 print rules
-    ├── vite-env.d.ts              # Vite client types reference
     ├── types/
-    │   └── index.ts               # Domain models, entities, and Context interfaces
+    │   └── index.ts               # Domain types for Leads, BANT, Documents, Stages, and Stats
     ├── components/
     │   ├── common/
-    │   │   ├── BrandLogo.tsx      # Reusable vector brand logo & icon components
-    │   │   ├── PocContactBanner.tsx # Floating POC developer contact widget
-    │   │   └── Toast.tsx          # Notification toast container
+    │   │   ├── BrandLogo.tsx      # SVG vector brand mark with live glow effects
+    │   │   ├── PocContactBanner.tsx # Floating bottom bar with developer WhatsApp link
+    │   │   └── Toast.tsx          # Animated notification toasts
     │   ├── layout/
     │   │   ├── Navbar.tsx         # Navigation bar, view tabs, theme toggle, and data menu
     │   │   ├── MetricsBar.tsx     # Top KPI summary cards (Pipeline, Won, Follow-ups, Speed to Lead)
@@ -160,7 +187,7 @@ leadflow-crm/
     │   ├── drawer/
     │   │   └── LeadDetailDrawer.tsx # Slide-over inspection drawer, BANT checklist, and documents
     │   └── modals/
-    │       ├── AboutModal.tsx     # Brand intelligence, system diagnostics, and shortcuts dialog
+    │       ├── AboutModal.tsx     # Brand intelligence, feature guide, and Google-indexed FAQ
     │       ├── AddLeadModal.tsx   # Create lead dialog
     │       ├── LostReasonModal.tsx # Deal loss categorization dialog
     │       ├── DocumentPreviewModal.tsx # Isolated A4 printable Quotation & Tax Invoice viewer
@@ -187,16 +214,13 @@ git clone https://github.com/sharilm/leads-flow.git
 # 2. Enter directory
 cd leads-flow
 
-# 3. Switch to TypeScript branch
-git checkout feat/typescript-migration
-
-# 4. Install dependencies
+# 3. Install dependencies
 npm install
 
-# 5. Type-check codebase
+# 4. Type-check codebase
 npm run typecheck
 
-# 6. Start local development server
+# 5. Start local development server
 npm run dev
 ```
 
@@ -209,17 +233,7 @@ Open your browser and navigate to `http://localhost:5173`.
 ### Deploy on Vercel
 1. Push your repository to GitHub.
 2. Import the project into [Vercel](https://vercel.com).
-3. Vercel will automatically detect `vercel.json` and apply all SPA routing and security headers.
-
-### Deploy on Netlify
-1. Connect your repository to [Netlify](https://netlify.com).
-2. Build command: `npm run build` | Publish directory: `dist`.
-3. Netlify will automatically detect `netlify.toml` for headers and redirects.
-
-### Deploy on Cloudflare Pages
-1. Connect repository in Cloudflare Pages dashboard.
-2. Build command: `npm run build` | Output directory: `dist`.
-3. Cloudflare Pages will automatically consume `public/_headers`.
+3. Vercel automatically detects `vercel.json` and applies Vite presets, static file exemptions (`/sitemap.xml`, `/robots.txt`), and security headers.
 
 ---
 
