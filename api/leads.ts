@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sql } from './_lib/db';
-import { rowToLead, type LeadRow } from './_lib/leadMapper';
-import { isOwnerAuthenticated, requireOwner } from './_lib/auth';
+import { sql } from './_lib/db.js';
+import { rowToLead, type LeadRow } from './_lib/leadMapper.js';
+import { isOwnerAuthenticated, requireOwner } from './_lib/auth.js';
 
 const VALID_STAGES = new Set(['new', 'contacted', 'qualified', 'proposal_sent', 'won', 'lost']);
 const VALID_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low']);
