@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
-import { SAMPLE_LEADS, STAGES, SOURCES, PRIORITIES, MAX_MOCKUP_LEADS } from '../data/initialLeads';
+import { SAMPLE_LEADS, STAGES, MAX_MOCKUP_LEADS } from '../data/initialLeads';
 import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, Stats, ToastState } from '../types';
 
 const STORAGE_KEY = 'leadflow_crm_leads_en_my_v3_15';

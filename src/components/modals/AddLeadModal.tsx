@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { SOURCES, PRIORITIES } from '../../data/initialLeads';
 import { BrandIcon } from '../common/BrandLogo';
-import { StageId, PriorityId } from '../../types';
+import { PriorityId } from '../../types';
 import { X, AlertCircle } from 'lucide-react';
 
 export default function AddLeadModal() {
@@ -15,7 +15,6 @@ export default function AddLeadModal() {
   const [dealValue, setDealValue] = useState<string>('');
   const [source, setSource] = useState<string>('Meta Ads');
   const [priority, setPriority] = useState<PriorityId>('medium');
-  const [stage, setStage] = useState<StageId>('new');
   const [notes, setNotes] = useState<string>('');
 
   if (!isAddModalOpen) return null;
@@ -40,7 +39,7 @@ export default function AddLeadModal() {
       dealValue: Number(dealValue) || 0,
       source,
       priority,
-      stage,
+      stage: 'new',
       notes,
     });
 

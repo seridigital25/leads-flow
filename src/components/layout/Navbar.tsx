@@ -204,7 +204,7 @@ export default function Navbar() {
                   className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <Info className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-                  <span>About LeadFlow CRM</span>
+                  <span>Panduan Ciri &amp; FAQ / About</span>
                 </button>
 
                 <button

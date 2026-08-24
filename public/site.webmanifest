@@ -1,0 +1,22 @@
+{
+  "name": "LeadFlow CRM — Sistem Pengurusan Prospek & WhatsApp Sales Malaysia",
+  "short_name": "LeadFlow CRM",
+  "description": "High-Velocity CRM and WhatsApp sales pipeline tailored for Malaysian businesses and marketing teams.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/brand-logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

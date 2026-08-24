@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { formatCurrency } from '../../lib/utils';
-import { TrendingUp, CalendarClock, AlertTriangle } from 'lucide-react';
+import { TrendingUp, CalendarClock } from 'lucide-react';
 
 export default function MetricsBar() {
   const { stats } = useLeads();

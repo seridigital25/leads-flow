@@ -1,0 +1,10 @@
+# Robots.txt for LeadFlow CRM (https://leadflow-crm.vercel.app/)
+User-agent: *
+Allow: /
+
+# Disallow sensitive asset bundles if any
+Disallow: /api/
+
+# Host and Sitemap
+Host: https://leadflow-crm.vercel.app
+Sitemap: https://leadflow-crm.vercel.app/sitemap.xml

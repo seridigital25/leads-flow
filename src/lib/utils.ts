@@ -33,7 +33,7 @@ export function formatDate(dateString: string | null | undefined): string {
       hour: '2-digit',
       minute: '2-digit',
     }).format(date);
-  } catch (e) {
+  } catch {
     return dateString;
   }
 }
@@ -51,7 +51,7 @@ export function formatShortDate(dateString: string | null | undefined): string {
       month: 'short',
       year: 'numeric',
     }).format(date);
-  } catch (e) {
+  } catch {
     return dateString;
   }
 }
@@ -71,7 +71,7 @@ export function getRelativeTime(dateString: string | null | undefined): string {
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
     return formatShortDate(dateString);
-  } catch (e) {
+  } catch {
     return '';
   }
 }
