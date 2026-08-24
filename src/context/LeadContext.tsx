@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { SAMPLE_LEADS, STAGES, MAX_MOCKUP_LEADS } from '../data/initialLeads';
-import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, Stats, ToastState } from '../types';
+import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, ToastState } from '../types';
+import { filterAndSortLeads, computeStats } from '../lib/leadSelectors';
 
 const STORAGE_KEY = 'leadflow_crm_leads_en_my_v3_15';
-const VIEW_KEY = 'leadflow_crm_view_v1';
-const DARK_KEY = 'leadflow_crm_dark_v1';
+export const VIEW_KEY = 'leadflow_crm_view_v1';
+export const DARK_KEY = 'leadflow_crm_dark_v1';
 
-const LeadContext = createContext<LeadContextType | null>(null);
+export const LeadContext = createContext<LeadContextType | null>(null);
 
 const RANDOM_DEMO_NAMES = [
   { name: 'Khairul Aming Enterprise', rep: 'Khairul', phone: '012-888 9921', company: 'Sambal Nyet Factory Kota Bharu', source: 'TikTok Ads', value: 45000, note: 'Inquired about warehouse CRM and bulk shipping SMS/WhatsApp notifications.' },
@@ -333,87 +334,18 @@ export function LeadProvider({ children }: { children: ReactNode }) {
   };
 
   // Filtered & Sorted Leads
-  const filteredLeads = useMemo(() => {
-    return leads.filter(lead => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = lead.name?.toLowerCase().includes(q);
-        const matchesCompany = lead.company?.toLowerCase().includes(q);
-        const matchesPhone = lead.phone?.toLowerCase().includes(q);
-        const matchesNotes = lead.notes?.toLowerCase().includes(q);
-        if (!matchesName && !matchesCompany && !matchesPhone && !matchesNotes) {
-          return false;
-        }
-      }
-
-      // Source Filter
-      if (selectedSource !== 'all' && lead.source !== selectedSource) {
-        return false;
-      }
-
-      // Priority Filter
-      if (selectedPriority !== 'all' && lead.priority !== selectedPriority) {
-        return false;
-      }
-
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'newest') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-      if (sortBy === 'value_desc') {
-        return (b.dealValue || 0) - (a.dealValue || 0);
-      }
-      if (sortBy === 'value_asc') {
-        return (a.dealValue || 0) - (b.dealValue || 0);
-      }
-      if (sortBy === 'followup') {
-        if (!a.nextFollowUpDate) return 1;
-        if (!b.nextFollowUpDate) return -1;
-        return new Date(a.nextFollowUpDate).getTime() - new Date(b.nextFollowUpDate).getTime();
-      }
-      if (sortBy === 'name_asc') {
-        return a.name.localeCompare(b.name);
-      }
-      return 0;
-    });
-  }, [leads, searchQuery, selectedSource, selectedPriority, sortBy]);
+  const filteredLeads = useMemo(
+    () => filterAndSortLeads(leads, { searchQuery, selectedSource, selectedPriority, sortBy }),
+    [leads, searchQuery, selectedSource, selectedPriority, sortBy]
+  );
 
   // Statistics Calculation
-  const stats: Stats = useMemo(() => {
-    const totalLeads = leads.length;
-    const activeLeads = leads.filter(l => l.stage !== 'won' && l.stage !== 'lost');
-    const wonLeads = leads.filter(l => l.stage === 'won');
-    const lostLeads = leads.filter(l => l.stage === 'lost');
-
-    const activePipelineValue = activeLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
-    const wonRevenue = wonLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
-    const lostRevenue = lostLeads.reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0);
-
-    const closedCount = wonLeads.length + lostLeads.length;
-    const winRate = closedCount > 0 ? Math.round((wonLeads.length / closedCount) * 100) : 0;
-    const avgDealSize = totalLeads > 0 ? Math.round((activePipelineValue + wonRevenue) / totalLeads) : 0;
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    const followUpsDueCount = leads.filter(
-      l => l.nextFollowUpDate && l.nextFollowUpDate <= todayStr && l.stage !== 'won' && l.stage !== 'lost'
-    ).length;
-
-    return {
-      totalLeads,
-      activePipelineValue,
-      wonRevenue,
-      lostRevenue,
-      winRate,
-      avgDealSize,
-      followUpsDueCount
-    };
-  }, [leads]);
+  const stats = useMemo(() => computeStats(leads), [leads]);
 
   return (
     <LeadContext.Provider
       value={{
+        mode: 'demo',
         leads,
         maxLeads: MAX_MOCKUP_LEADS,
         isLimitReached,

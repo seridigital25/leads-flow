@@ -132,6 +132,9 @@ export interface FollowUpInfo {
 }
 
 export interface LeadContextType {
+  mode: 'demo' | 'owner';
+  loading?: boolean;
+  signOut?: () => void;
   leads: Lead[];
   maxLeads: number;
   isLimitReached: boolean;

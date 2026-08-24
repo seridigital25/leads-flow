@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BrandLogo, { BrandIcon } from '../components/common/BrandLogo';
+import RequestDemoModal from '../components/modals/RequestDemoModal';
 import {
   Zap,
   MessageSquare,
@@ -24,6 +25,7 @@ import {
   Menu as MenuIcon,
   TrendingUp,
   Smartphone,
+  ClipboardList,
 } from 'lucide-react';
 
 const DEV_PHONE = '60135928812';
@@ -357,6 +359,8 @@ function HeroMockup() {
 }
 
 export default function Landing() {
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+
   return (
     <div id="top" className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       <NavBar />
@@ -394,6 +398,13 @@ export default function Landing() {
                 Cuba Live Demo Percuma
                 <ArrowRight className="w-4 h-4" />
               </a>
+              <button
+                onClick={() => setDemoModalOpen(true)}
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 rounded-xl border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-bold transition-colors cursor-pointer"
+              >
+                <ClipboardList className="w-4 h-4" />
+                Request Demo
+              </button>
               <a
                 href={HERO_WA}
                 target="_blank"
@@ -711,6 +722,13 @@ export default function Landing() {
                 Cuba Live Demo Percuma
                 <ArrowRight className="w-4 h-4" />
               </a>
+              <button
+                onClick={() => setDemoModalOpen(true)}
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-7 rounded-xl border-2 border-emerald-500 text-emerald-400 hover:bg-emerald-950/40 font-bold transition-colors cursor-pointer"
+              >
+                <ClipboardList className="w-4 h-4" />
+                Request Demo
+              </button>
               <a
                 href={HERO_WA}
                 target="_blank"
@@ -724,6 +742,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <RequestDemoModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800">
