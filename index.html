@@ -71,6 +71,10 @@
     <meta name="twitter:description" content="Sistem CRM pantas untuk bisnes Malaysia: 1-Click WhatsApp, Kanban sales pipeline, pengesanan iklan Meta/TikTok Ads, dan cetakan Quotation/Invois RM. Dari RM 99/bulan." />
     <meta name="twitter:image" content="https://myleads-flow.vercel.app/og-image.png" />
     <meta name="twitter:image:alt" content="LeadFlow CRM Malaysia Preview Card" />
+    <meta name="twitter:label1" content="Harga" />
+    <meta name="twitter:data1" content="Dari RM 99/bulan" />
+    <meta name="twitter:label2" content="Hubungi" />
+    <meta name="twitter:data2" content="WhatsApp +60 13-592 8812" />
 
     <!-- Google Search Engine Favicon & Icon Compatibility (Multiple of 48px standard) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -83,7 +87,14 @@
     <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Preload critical latin-subset font files (LCP optimization) -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/plusjakartasans/v12/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yygg_vb.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2">
+    <!-- Non-blocking font stylesheet: swap to media=all once loaded (protects LCP/FID) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
     
     <!-- Structured Data (JSON-LD): WebApplication & Software Schema -->
     <script type="application/ld+json">

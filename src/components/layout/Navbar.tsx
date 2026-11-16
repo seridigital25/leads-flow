@@ -16,7 +16,13 @@ import {
   Info,
   MessageSquare,
   ClipboardList,
-  LogOut
+  LogOut,
+  FileBarChart,
+  Users,
+  Radio,
+  ScrollText,
+  FileSpreadsheet,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }) {
@@ -34,6 +40,7 @@ export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }
     quickAddDemoLead,
     resetToDefaults,
     exportData,
+    exportCsv,
     showToast
   } = useLeads();
   const isOwner = mode === 'owner';
@@ -73,39 +80,83 @@ export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }
           <BrandLogo size="md" onClick={() => { window.location.href = '/'; }} />
 
           {/* View Tabs */}
-          <nav className="hidden md:flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-medium">
+          <nav className="hidden md:flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-medium overflow-x-auto max-w-[52vw] lg:max-w-none">
             <button
               onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 viewMode === 'kanban'
                   ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               <Kanban className="w-3.5 h-3.5" />
-              <span>Kanban Pipeline</span>
+              <span>Pipeline</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 viewMode === 'table'
                   ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               <Table2 className="w-3.5 h-3.5" />
-              <span>Table View</span>
+              <span>Table</span>
             </button>
             <button
               onClick={() => setViewMode('analytics')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 viewMode === 'analytics'
                   ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Funnel & Analytics</span>
+              <span>Analytics</span>
+            </button>
+            <button
+              onClick={() => setViewMode('reports')}
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                viewMode === 'reports'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <FileBarChart className="w-3.5 h-3.5" />
+              <span>Reports</span>
+            </button>
+            <button
+              onClick={() => setViewMode('contacts')}
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                viewMode === 'contacts'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Contacts</span>
+            </button>
+            <button
+              onClick={() => setViewMode('sources')}
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                viewMode === 'sources'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>Sources</span>
+            </button>
+            <button
+              onClick={() => setViewMode('audit')}
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                viewMode === 'audit'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <ScrollText className="w-3.5 h-3.5" />
+              <span>Audit</span>
             </button>
           </nav>
         </div>
@@ -246,6 +297,39 @@ export default function Navbar({ onRequestDemo }: { onRequestDemo?: () => void }
                 >
                   <Download className="w-3.5 h-3.5 text-zinc-500" />
                   <span>Export Leads (JSON)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    exportCsv();
+                    setMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Export Leads (CSV)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setViewMode('audit');
+                    setMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <ScrollText className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Audit Trail</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setViewMode('privacy');
+                    setMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Privacy Notice</span>
                 </button>
 
                 {isOwner ? (

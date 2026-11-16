@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { useLeads } from '../../context/LeadContext';
-import { SOURCES, PRIORITIES } from '../../data/initialLeads';
+import { PRIORITIES } from '../../data/initialLeads';
 import { BrandIcon } from '../common/BrandLogo';
 import { PriorityId } from '../../types';
 import { X, AlertCircle } from 'lucide-react';
 
 export default function AddLeadModal() {
-  const { isAddModalOpen, setIsAddModalOpen, addLead, isLimitReached, maxLeads, leads } = useLeads();
+  const { isAddModalOpen, setIsAddModalOpen, addLead, isLimitReached, maxLeads, leads, sources } = useLeads();
+
+  // Active sources from the Sources module (falls back to built-ins), plus
+  // any sources already used by existing leads so legacy data stays selectable.
+  const availableSources = React.useMemo(() => {
+    const names = new Set<string>(sources.filter((s) => s.isActive).map((s) => s.name));
+    leads.forEach((l) => names.add(l.source));
+    return Array.from(names);
+  }, [sources, leads]);
 
   const [name, setName] = useState<string>('');
   const [company, setCompany] = useState<string>('');
@@ -189,7 +197,7 @@ export default function AddLeadModal() {
                 onChange={(e) => setSource(e.target.value)}
                 className="w-full text-xs p-2 rounded-md bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 cursor-pointer disabled:opacity-50"
               >
-                {SOURCES.map(s => (
+                {availableSources.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>

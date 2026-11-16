@@ -11,11 +11,12 @@ import {
   Trash2, 
   Inbox,
   FileText,
-  CheckCircle2
+  CheckCircle2,
+  FileSpreadsheet
 } from 'lucide-react';
 
 export default function LeadsTableView() {
-  const { filteredLeads, moveStage, setSelectedLeadId, deleteLead } = useLeads();
+  const { filteredLeads, moveStage, setSelectedLeadId, deleteLead, exportCsv } = useLeads();
 
   const handleWhatsApp = (e: React.MouseEvent, lead: Lead) => {
     e.stopPropagation();
@@ -38,6 +39,22 @@ export default function LeadsTableView() {
 
   return (
     <div className="flex-1 overflow-auto p-4 bg-zinc-100/60 dark:bg-zinc-950">
+      {/* Export CSV action bar */}
+      <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          <strong className="text-zinc-800 dark:text-zinc-200 font-semibold">{filteredLeads.length}</strong> leads (respecting current filters)
+        </span>
+        <button
+          onClick={exportCsv}
+          disabled={filteredLeads.length === 0}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          title="Export the filtered leads to a CSV file (leadflow-export-YYYY-MM-DD.csv)"
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+          <span>Export CSV</span>
+        </button>
+      </div>
+
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">

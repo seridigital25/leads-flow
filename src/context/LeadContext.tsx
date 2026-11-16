@@ -1,13 +1,64 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
-import { SAMPLE_LEADS, STAGES, MAX_MOCKUP_LEADS } from '../data/initialLeads';
-import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, ToastState } from '../types';
+import { SAMPLE_LEADS, STAGES, MAX_MOCKUP_LEADS, DEFAULT_SOURCES } from '../data/initialLeads';
+import { Lead, LeadContextType, SortOption, ViewMode, StageId, PriorityId, Activity, BANT, ToastState, Contact, LeadSource, AuditEvent } from '../types';
 import { filterAndSortLeads, computeStats } from '../lib/leadSelectors';
+import { trackLeadCreated, trackStageChanged, trackExport } from '../lib/analytics';
+import { logAuditEvent, readAuditEvents, clearAuditStorage } from '../lib/audit';
+import { downloadLeadsCsv } from '../lib/exportCsv';
 
 const STORAGE_KEY = 'leadflow_crm_leads_en_my_v3_15';
+const SOURCES_KEY = 'leadflow_crm_sources_v1';
 export const VIEW_KEY = 'leadflow_crm_view_v1';
 export const DARK_KEY = 'leadflow_crm_dark_v1';
 
+const VALID_VIEW_MODES: ViewMode[] = ['kanban', 'table', 'analytics', 'reports', 'contacts', 'sources', 'audit', 'privacy'];
+
 export const LeadContext = createContext<LeadContextType | null>(null);
+
+/** Build contacts by de-duplicating leads on email (or normalized phone). */
+function buildContactsFromLeads(leads: Lead[]): Contact[] {
+  const byKey = new Map<string, Contact>();
+  for (const lead of [...leads].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))) {
+    const phoneKey = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+    const emailKey = lead.email ? lead.email.toLowerCase() : '';
+    const key = emailKey || `p:${phoneKey}` || `n:${lead.name.toLowerCase()}`;
+    const existing = byKey.get(key);
+    if (existing) {
+      if (!existing.linkedLeadIds.includes(lead.id)) existing.linkedLeadIds.push(lead.id);
+      if (!existing.company && lead.company) existing.company = lead.company;
+      if (!existing.email && lead.email) existing.email = lead.email;
+      if (!existing.phone && lead.phone) existing.phone = lead.phone;
+      existing.updatedAt = lead.updatedAt;
+    } else {
+      byKey.set(key, {
+        id: `contact-${key.replace(/[^a-z0-9]/gi, '') || lead.id}`,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        company: lead.company,
+        source: lead.source,
+        createdAt: lead.createdAt,
+        updatedAt: lead.updatedAt,
+        linkedLeadIds: [lead.id],
+      });
+    }
+  }
+  return Array.from(byKey.values());
+}
+
+/** Load lead sources from localStorage, falling back to the built-in defaults. */
+function loadInitialSources(): LeadSource[] {
+  try {
+    const saved = localStorage.getItem(SOURCES_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed as LeadSource[];
+    }
+  } catch (e) {
+    console.error('Error loading sources from storage', e);
+  }
+  return DEFAULT_SOURCES;
+}
 
 const RANDOM_DEMO_NAMES = [
   { name: 'Khairul Aming Enterprise', rep: 'Khairul', phone: '012-888 9921', company: 'Sambal Nyet Factory Kota Bharu', source: 'TikTok Ads', value: 45000, note: 'Inquired about warehouse CRM and bulk shipping SMS/WhatsApp notifications.' },
@@ -33,8 +84,8 @@ export function LeadProvider({ children }: { children: ReactNode }) {
   });
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem(VIEW_KEY);
-    if (saved === 'kanban' || saved === 'table' || saved === 'analytics') {
+    const saved = localStorage.getItem(VIEW_KEY) as ViewMode | null;
+    if (saved && VALID_VIEW_MODES.includes(saved)) {
       return saved;
     }
     return 'kanban';
@@ -60,6 +111,8 @@ export function LeadProvider({ children }: { children: ReactNode }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [lostModalLeadId, setLostModalLeadId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [sources, setSources] = useState<LeadSource[]>(loadInitialSources);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>(readAuditEvents);
 
   const isLimitReached = leads.length >= MAX_MOCKUP_LEADS;
 
@@ -71,6 +124,14 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       console.error('Error saving leads to storage', e);
     }
   }, [leads]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SOURCES_KEY, JSON.stringify(sources));
+    } catch (e) {
+      console.error('Error saving sources to storage', e);
+    }
+  }, [sources]);
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, viewMode);
@@ -96,6 +157,22 @@ export function LeadProvider({ children }: { children: ReactNode }) {
     if (!selectedLeadId) return null;
     return leads.find(l => l.id === selectedLeadId) || null;
   }, [leads, selectedLeadId]);
+
+  // Contacts are derived from leads (auto-created whenever a lead is created)
+  const contacts = useMemo(() => buildContactsFromLeads(leads), [leads]);
+
+  const getLinkedLeads = (contactId: string): Lead[] => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (!contact) return [];
+    return leads.filter(l => contact.linkedLeadIds.includes(l.id));
+  };
+
+  /** Log an audit event and refresh the in-context list. */
+  const logAndSet = (event: Parameters<typeof logAuditEvent>[0]) => {
+    const created = logAuditEvent(event);
+    setAuditEvents(readAuditEvents());
+    return created;
+  };
 
   // Actions
   const addLead = (newLeadData: Partial<Lead>): Lead | null => {
@@ -140,6 +217,14 @@ export function LeadProvider({ children }: { children: ReactNode }) {
     };
 
     setLeads(prev => [newLead, ...prev]);
+    trackLeadCreated({ mode: 'demo', source: newLead.source, stage: newLead.stage, dealValue: newLead.dealValue });
+    logAndSet({
+      action: 'lead_created',
+      actor: 'You (Demo)',
+      targetId: newLead.id,
+      targetName: newLead.name,
+      details: `Lead created via ${newLead.source}. Contact auto-linked.`,
+    });
     showToast(`Lead "${newLead.name}" added successfully! (${leads.length + 1}/${MAX_MOCKUP_LEADS})`);
     return newLead;
   };
@@ -192,12 +277,22 @@ export function LeadProvider({ children }: { children: ReactNode }) {
   };
 
   const updateLead = (id: string, updates: Partial<Lead>) => {
+    const before = leads.find(l => l.id === id);
     setLeads(prev => prev.map(l => {
       if (l.id === id) {
         return { ...l, ...updates, updatedAt: new Date().toISOString() };
       }
       return l;
     }));
+    if (before && (updates.name !== undefined || updates.company !== undefined || updates.phone !== undefined || updates.email !== undefined || updates.source !== undefined)) {
+      logAndSet({
+        action: 'lead_updated',
+        actor: 'You (Demo)',
+        targetId: id,
+        targetName: updates.name || before.name,
+        details: `Lead details updated (contact info / source).`,
+      });
+    }
   };
 
   const moveStage = (leadId: string, newStage: StageId | string) => {
@@ -206,11 +301,16 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const leadBefore = leads.find(l => l.id === leadId);
+    const stageObj = STAGES.find(s => s.id === newStage);
+    const stageLabel = stageObj ? stageObj.label : newStage;
+
     setLeads(prev => prev.map(l => {
       if (l.id === leadId) {
-        const stageObj = STAGES.find(s => s.id === newStage);
-        const stageLabel = stageObj ? stageObj.label : newStage;
-        
+        if (l.stage !== newStage) {
+          trackStageChanged({ mode: 'demo', from: l.stage, to: newStage as string, dealValue: l.dealValue });
+        }
+
         const newActivity: Activity = {
           id: `act-${Date.now()}`,
           type: 'note',
@@ -230,11 +330,21 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       return l;
     }));
 
-    const stageObj = STAGES.find(s => s.id === newStage);
+    if (leadBefore && leadBefore.stage !== newStage) {
+      logAndSet({
+        action: 'lead_stage_changed',
+        actor: 'You (Demo)',
+        targetId: leadId,
+        targetName: leadBefore.name,
+        details: `Stage moved from "${leadBefore.stage}" to "${newStage}".`,
+      });
+    }
+
     showToast(`Stage updated to ${stageObj?.label || newStage}`);
   };
 
   const confirmLostReason = (leadId: string, reason: string) => {
+    const leadBefore = leads.find(l => l.id === leadId);
     setLeads(prev => prev.map(l => {
       if (l.id === leadId) {
         const newActivity: Activity = {
@@ -256,6 +366,14 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       return l;
     }));
 
+    trackStageChanged({ mode: 'demo', from: leadBefore?.stage || 'new', to: 'lost', dealValue: leadBefore?.dealValue });
+    logAndSet({
+      action: 'lead_lost',
+      actor: 'You (Demo)',
+      targetId: leadId,
+      targetName: leadBefore?.name,
+      details: `Marked Closed Lost. Reason: ${reason}.`,
+    });
     setLostModalLeadId(null);
     showToast('Lead marked as Closed Lost.');
   };
@@ -310,8 +428,16 @@ export function LeadProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteLead = (leadId: string) => {
+    const removed = leads.find(l => l.id === leadId);
     setLeads(prev => prev.filter(l => l.id !== leadId));
     if (selectedLeadId === leadId) setSelectedLeadId(null);
+    logAndSet({
+      action: 'lead_deleted',
+      actor: 'You (Demo)',
+      targetId: leadId,
+      targetName: removed?.name,
+      details: `Lead record deleted.`,
+    });
     showToast('Lead record deleted.');
   };
 
@@ -319,6 +445,11 @@ export function LeadProvider({ children }: { children: ReactNode }) {
     setLeads(SAMPLE_LEADS);
     localStorage.removeItem(STORAGE_KEY);
     setSelectedLeadId(null);
+    logAndSet({
+      action: 'demo_reset',
+      actor: 'You (Demo)',
+      details: `Demo data reset to ${SAMPLE_LEADS.length} initial leads.`,
+    });
     showToast(`Demo data reset to ${SAMPLE_LEADS.length} initial leads.`);
   };
 
@@ -330,7 +461,61 @@ export function LeadProvider({ children }: { children: ReactNode }) {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    trackExport({ format: 'json', mode: 'demo', count: leads.length });
+    logAndSet({
+      action: 'export_json',
+      actor: 'You (Demo)',
+      details: `Exported ${leads.length} leads to JSON.`,
+    });
     showToast('Leads exported to JSON format.');
+  };
+
+  const exportCsv = () => {
+    downloadLeadsCsv(filteredLeads, 'Demo User');
+    trackExport({ format: 'csv', mode: 'demo', count: filteredLeads.length });
+    setAuditEvents(readAuditEvents()); // downloadLeadsCsv logs the event itself
+    showToast(`Exported ${filteredLeads.length} leads to CSV.`);
+  };
+
+  // ── Lead Sources Management ──
+  const addSource = ({ name, category }: { name: string; category: string }): LeadSource | null => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      showToast('Source name cannot be empty.', 'error');
+      return null;
+    }
+    if (sources.some(s => s.name.toLowerCase() === trimmed.toLowerCase())) {
+      showToast(`Source "${trimmed}" already exists.`, 'error');
+      return null;
+    }
+    const now = new Date().toISOString();
+    const newSource: LeadSource = {
+      id: `src-${Date.now()}`,
+      name: trimmed,
+      category: category.trim() || 'Other',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setSources(prev => [...prev, newSource]);
+    showToast(`Lead source "${newSource.name}" added.`);
+    return newSource;
+  };
+
+  const updateSource = (id: string, updates: Partial<LeadSource>) => {
+    setSources(prev => prev.map(s => (s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s)));
+  };
+
+  const deleteSource = (id: string) => {
+    const removed = sources.find(s => s.id === id);
+    setSources(prev => prev.filter(s => s.id !== id));
+    showToast(`Lead source "${removed?.name || id}" deleted.`);
+  };
+
+  const clearAuditLog = () => {
+    clearAuditStorage();
+    setAuditEvents([]);
+    showToast('Audit log cleared.');
   };
 
   // Filtered & Sorted Leads
@@ -381,7 +566,16 @@ export function LeadProvider({ children }: { children: ReactNode }) {
         toggleBANT,
         quickAddDemoLead,
         resetToDefaults,
-        exportData
+        exportData,
+        exportCsv,
+        contacts,
+        getLinkedLeads,
+        sources,
+        addSource,
+        updateSource,
+        deleteSource,
+        auditEvents,
+        clearAuditLog
       }}
     >
       {children}

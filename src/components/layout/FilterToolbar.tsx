@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLeads } from '../../context/LeadContext';
-import { SOURCES, PRIORITIES } from '../../data/initialLeads';
+import { PRIORITIES } from '../../data/initialLeads';
 import { SortOption } from '../../types';
 import { Search, ArrowUpDown, X } from 'lucide-react';
 
@@ -15,8 +15,17 @@ export default function FilterToolbar() {
     sortBy,
     setSortBy,
     filteredLeads,
-    leads
+    leads,
+    sources
   } = useLeads();
+
+  // Sources from the Sources module plus any source used by existing leads,
+  // so filtering works for custom and legacy sources alike.
+  const availableSources = React.useMemo(() => {
+    const names = new Set<string>(sources.map((s) => s.name));
+    leads.forEach((l) => names.add(l.source));
+    return Array.from(names).sort();
+  }, [sources, leads]);
 
   const hasActiveFilters = searchQuery || selectedSource !== 'all' || selectedPriority !== 'all';
 
@@ -58,7 +67,7 @@ export default function FilterToolbar() {
             className="text-xs py-1.5 px-2.5 rounded-md bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-400 cursor-pointer"
           >
             <option value="all">All Sources</option>
-            {SOURCES.map(src => (
+            {availableSources.map(src => (
               <option key={src} value={src}>{src}</option>
             ))}
           </select>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrandIcon } from '../common/BrandLogo';
 import { X, CheckCircle2, ArrowRight, MessageSquare } from 'lucide-react';
+import { trackDemoRequested } from '../../lib/analytics';
 
 export type InterestType = 'try_demo' | 'subscribe' | 'custom_deal';
 
@@ -30,7 +31,10 @@ export default function RequestDemoModal({ open, onClose, defaultInterest = 'try
   const [success, setSuccess] = useState(false);
 
   React.useEffect(() => {
-    if (open) setInterestType(defaultInterest);
+    if (open) {
+      setInterestType(defaultInterest);
+      trackDemoRequested({ action: 'opened', interestType: defaultInterest });
+    }
   }, [open, defaultInterest]);
 
   if (!open) return null;
@@ -65,6 +69,7 @@ export default function RequestDemoModal({ open, onClose, defaultInterest = 'try
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || 'Gagal hantar borang. Sila cuba lagi.');
       }
+      trackDemoRequested({ action: 'submitted', interestType });
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Gagal hantar borang. Sila cuba lagi.');

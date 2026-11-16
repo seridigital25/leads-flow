@@ -108,7 +108,57 @@ export interface QuickTemplate {
 
 export type SortOption = 'newest' | 'value_desc' | 'value_asc' | 'followup' | 'name_asc';
 
-export type ViewMode = 'kanban' | 'table' | 'analytics';
+export type ViewMode = 'kanban' | 'table' | 'analytics' | 'reports' | 'contacts' | 'sources' | 'audit' | 'privacy';
+
+/* ── Contacts Module ── */
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  company: string;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+  linkedLeadIds: string[];
+}
+
+/* ── Lead Sources Management ── */
+export interface LeadSource {
+  id: string;
+  name: string;
+  category: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ── Audit Trail ── */
+export type AuditAction =
+  | 'lead_created'
+  | 'lead_updated'
+  | 'lead_deleted'
+  | 'lead_stage_changed'
+  | 'lead_lost'
+  | 'export_csv'
+  | 'export_json'
+  | 'demo_reset';
+
+export interface AuditEvent {
+  id: string;
+  action: AuditAction;
+  actor: string;
+  targetId?: string;
+  targetName?: string;
+  details?: string;
+  timestamp: string;
+}
+
+/* ── Privacy Notices ── */
+export interface PrivacyConsent {
+  noticeVersion: string;
+  consentTimestamp: string | null;
+}
 
 export interface Stats {
   totalLeads: number;
@@ -171,4 +221,16 @@ export interface LeadContextType {
   quickAddDemoLead: () => void;
   resetToDefaults: () => void;
   exportData: () => void;
+  exportCsv: () => void;
+  /* Contacts module */
+  contacts: Contact[];
+  getLinkedLeads: (contactId: string) => Lead[];
+  /* Sources management */
+  sources: LeadSource[];
+  addSource: (data: { name: string; category: string }) => LeadSource | null;
+  updateSource: (id: string, updates: Partial<LeadSource>) => void;
+  deleteSource: (id: string) => void;
+  /* Audit trail */
+  auditEvents: AuditEvent[];
+  clearAuditLog: () => void;
 }

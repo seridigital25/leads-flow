@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import JavaScriptObfuscator from 'javascript-obfuscator'
+
+// NOTE: The custom javascript-obfuscator plugin was removed.
+// controlFlowFlattening + deadCodeInjection + stringArray(rc4) inflated the
+// bundle from ~350 KB to 2.7 MB (971 KB gzip). Terser minification below
+// already strips comments/mangles names; obfuscation added size, not security.
 
 // Enterprise Security Headers Configuration
 const securityHeaders = {
@@ -15,49 +19,11 @@ const securityHeaders = {
   'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 }
 
-// Custom Deep Obfuscation Plugin for Production Chunks
-function codeObfuscatorPlugin() {
-  return {
-    name: 'vite-plugin-deep-code-obfuscator',
-    apply: 'build',
-    enforce: 'post',
-    generateBundle(options, bundle) {
-      for (const fileName in bundle) {
-        const chunk = bundle[fileName];
-        if (chunk.type === 'chunk' && chunk.code) {
-          const obfuscationResult = JavaScriptObfuscator.obfuscate(chunk.code, {
-            compact: true,
-            controlFlowFlattening: true,
-            controlFlowFlatteningThreshold: 0.65,
-            deadCodeInjection: true,
-            deadCodeInjectionThreshold: 0.25,
-            identifierNamesGenerator: 'hexadecimal',
-            numbersToExpressions: true,
-            renameGlobals: false,
-            selfDefending: true,
-            simplify: true,
-            splitStrings: true,
-            splitStringsChunkLength: 8,
-            stringArray: true,
-            stringArrayCallsTransform: true,
-            stringArrayEncoding: ['base64', 'rc4'],
-            stringArrayThreshold: 0.75,
-            transformObjectKeys: true,
-            unicodeEscapeSequence: false
-          });
-          chunk.code = obfuscationResult.getObfuscatedCode();
-        }
-      }
-    }
-  };
-}
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(),
-    codeObfuscatorPlugin()
+    tailwindcss()
   ],
   server: {
     headers: securityHeaders,
@@ -85,6 +51,20 @@ export default defineConfig({
       },
       mangle: {
         toplevel: true
+      }
+    },
+    rollupOptions: {
+      output: {
+        // Vendor chunk splitting (rolldown requires function form):
+        // stable framework code cached separately from app code, and
+        // lucide-react icons isolated from React core.
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('lucide-react')) return 'lucide-react';
+            if (id.includes('react-dom')) return 'react-dom';
+            if (id.includes('react/') || id.includes('scheduler')) return 'react';
+          }
+        }
       }
     }
   }

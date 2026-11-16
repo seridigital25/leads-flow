@@ -1,4 +1,4 @@
-import { Lead, StageConfig, PriorityConfig, QuickTemplate } from '../types';
+import { Lead, StageConfig, PriorityConfig, QuickTemplate, LeadSource } from '../types';
 
 export const MAX_MOCKUP_LEADS: number = 15;
 
@@ -18,6 +18,15 @@ export const SOURCES: string[] = [
   'Direct WhatsApp',
   'Google Search',
   'Referral / Partner',
+];
+
+export const DEFAULT_SOURCES: LeadSource[] = [
+  { id: 'src-meta-ads', name: 'Meta Ads', category: 'Paid Ads', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+  { id: 'src-tiktok-ads', name: 'TikTok Ads', category: 'Paid Ads', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+  { id: 'src-website-form', name: 'Website Form', category: 'Inbound', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+  { id: 'src-direct-whatsapp', name: 'Direct WhatsApp', category: 'Inbound', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+  { id: 'src-google-search', name: 'Google Search', category: 'Organic', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+  { id: 'src-referral', name: 'Referral / Partner', category: 'Referral', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
 ];
 
 export const PRIORITIES: PriorityConfig[] = [

@@ -19,6 +19,7 @@ const entries = {
   'owner/login': 'api/owner/login.ts',
   'owner/logout': 'api/owner/logout.ts',
   'owner/session': 'api/owner/session.ts',
+  'audit': 'api/audit.ts',
 };
 
 async function buildAll() {
@@ -45,6 +46,7 @@ function matchRoute(pathname) {
   if (pathname === '/api/owner/login') return { entry: entries['owner/login'], params: {} };
   if (pathname === '/api/owner/logout') return { entry: entries['owner/logout'], params: {} };
   if (pathname === '/api/owner/session') return { entry: entries['owner/session'], params: {} };
+  if (pathname === '/api/audit') return { entry: entries['audit'], params: {} };
   return null;
 }
 

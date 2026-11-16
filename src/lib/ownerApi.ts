@@ -1,4 +1,4 @@
-import { Lead } from '../types';
+import { Lead, AuditEvent } from '../types';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -31,4 +31,8 @@ export const ownerApi = {
   updateLead: (id: string, updates: Partial<Lead>) =>
     request<Lead>(`/api/leads/${id}`, { method: 'PATCH', body: JSON.stringify(updates) }),
   deleteLead: (id: string) => request<void>(`/api/leads/${id}`, { method: 'DELETE' }),
+
+  listAuditEvents: () => request<AuditEvent[]>('/api/audit'),
+  logAuditEvent: (event: AuditEvent) =>
+    request<AuditEvent>('/api/audit', { method: 'POST', body: JSON.stringify(event) }),
 };

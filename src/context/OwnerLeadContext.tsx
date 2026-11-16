@@ -1,17 +1,68 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
-import { STAGES } from '../data/initialLeads';
-import { Lead, LeadContextType, SortOption, ViewMode, Activity, BANT, ToastState } from '../types';
+import { STAGES, DEFAULT_SOURCES } from '../data/initialLeads';
+import { Lead, LeadContextType, SortOption, ViewMode, Activity, BANT, ToastState, Contact, LeadSource, AuditEvent } from '../types';
 import { filterAndSortLeads, computeStats } from '../lib/leadSelectors';
 import { ownerApi } from '../lib/ownerApi';
+import { trackLeadCreated, trackStageChanged, trackExport } from '../lib/analytics';
+import { logAuditEvent, readAuditEvents, clearAuditStorage } from '../lib/audit';
+import { downloadLeadsCsv } from '../lib/exportCsv';
 import { LeadContext, VIEW_KEY, DARK_KEY } from './LeadContext';
+
+const SOURCES_KEY = 'leadflow_owner_sources_v1';
+const VALID_VIEW_MODES: ViewMode[] = ['kanban', 'table', 'analytics', 'reports', 'contacts', 'sources', 'audit', 'privacy'];
+
+/** Load owner lead sources from localStorage, falling back to defaults. */
+function loadOwnerSources(): LeadSource[] {
+  try {
+    const saved = localStorage.getItem(SOURCES_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed as LeadSource[];
+    }
+  } catch (e) {
+    console.error('Error loading owner sources', e);
+  }
+  return DEFAULT_SOURCES;
+}
+
+/** Shared helper: build contacts by de-duplicating leads on email (or normalized phone). */
+export function buildContactsFromLeads(leads: Lead[]): Contact[] {
+  const byKey = new Map<string, Contact>();
+  for (const lead of [...leads].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))) {
+    const phoneKey = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+    const emailKey = lead.email ? lead.email.toLowerCase() : '';
+    const key = emailKey || `p:${phoneKey}` || `n:${lead.name.toLowerCase()}`;
+    const existing = byKey.get(key);
+    if (existing) {
+      if (!existing.linkedLeadIds.includes(lead.id)) existing.linkedLeadIds.push(lead.id);
+      if (!existing.company && lead.company) existing.company = lead.company;
+      if (!existing.email && lead.email) existing.email = lead.email;
+      if (!existing.phone && lead.phone) existing.phone = lead.phone;
+      existing.updatedAt = lead.updatedAt;
+    } else {
+      byKey.set(key, {
+        id: `contact-${key.replace(/[^a-z0-9]/gi, '') || lead.id}`,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        company: lead.company,
+        source: lead.source,
+        createdAt: lead.createdAt,
+        updatedAt: lead.updatedAt,
+        linkedLeadIds: [lead.id],
+      });
+    }
+  }
+  return Array.from(byKey.values());
+}
 
 export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNode; onSignedOut: () => void }) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem(VIEW_KEY);
-    return saved === 'kanban' || saved === 'table' || saved === 'analytics' ? saved : 'kanban';
+    const saved = localStorage.getItem(VIEW_KEY) as ViewMode | null;
+    return saved && VALID_VIEW_MODES.includes(saved) ? saved : 'kanban';
   });
 
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -31,6 +82,26 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [lostModalLeadId, setLostModalLeadId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [sources, setSources] = useState<LeadSource[]>(loadOwnerSources);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>(readAuditEvents);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SOURCES_KEY, JSON.stringify(sources));
+    } catch (e) {
+      console.error('Error saving owner sources', e);
+    }
+  }, [sources]);
+
+  /** Log an audit event: persisted locally and mirrored to the owner API (best-effort). */
+  const logAndSet = (event: Parameters<typeof logAuditEvent>[0]) => {
+    const created = logAuditEvent(event);
+    setAuditEvents(readAuditEvents());
+    ownerApi.logAuditEvent(created).catch(() => {
+      /* Audit mirroring is best-effort; local storage is the source of truth for now. */
+    });
+    return created;
+  };
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, viewMode);
@@ -84,11 +155,19 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
     };
 
     setLeads((prev) => [optimistic, ...prev]);
+    trackLeadCreated({ mode: 'owner', source: optimistic.source, stage: optimistic.stage, dealValue: optimistic.dealValue });
 
     ownerApi
       .createLead(newLeadData)
       .then((created) => {
         setLeads((prev) => prev.map((l) => (l.id === tempId ? created : l)));
+        logAndSet({
+          action: 'lead_created',
+          actor: 'Owner',
+          targetId: created.id,
+          targetName: created.name,
+          details: `Lead created via ${created.source}. Contact auto-linked.`,
+        });
         showToast(`Lead "${created.name}" added successfully!`);
       })
       .catch((err) => {
@@ -115,7 +194,17 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
   };
 
   const updateLead = (id: string, updates: Partial<Lead>) => {
+    const before = leads.find((l) => l.id === id);
     patchLead(id, updates);
+    if (before && (updates.name !== undefined || updates.company !== undefined || updates.phone !== undefined || updates.email !== undefined || updates.source !== undefined)) {
+      logAndSet({
+        action: 'lead_updated',
+        actor: 'Owner',
+        targetId: id,
+        targetName: updates.name || before.name,
+        details: 'Lead details updated (contact info / source).',
+      });
+    }
   };
 
   const moveStage: LeadContextType['moveStage'] = (leadId, newStage) => {
@@ -127,6 +216,16 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
     const lead = leads.find((l) => l.id === leadId);
     const stageObj = STAGES.find((s) => s.id === newStage);
     const stageLabel = stageObj ? stageObj.label : newStage;
+    if (lead && lead.stage !== newStage) {
+      trackStageChanged({ mode: 'owner', from: lead.stage, to: newStage, dealValue: lead.dealValue });
+      logAndSet({
+        action: 'lead_stage_changed',
+        actor: 'Owner',
+        targetId: leadId,
+        targetName: lead.name,
+        details: `Stage moved from "${lead.stage}" to "${newStage}".`,
+      });
+    }
     const newActivity: Activity = {
       id: `act-${Date.now()}`,
       type: 'note',
@@ -148,6 +247,14 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
 
   const confirmLostReason = (leadId: string, reason: string) => {
     const lead = leads.find((l) => l.id === leadId);
+    trackStageChanged({ mode: 'owner', from: lead?.stage || 'new', to: 'lost', dealValue: lead?.dealValue });
+    logAndSet({
+      action: 'lead_lost',
+      actor: 'Owner',
+      targetId: leadId,
+      targetName: lead?.name,
+      details: `Marked Closed Lost. Reason: ${reason}.`,
+    });
     const newActivity: Activity = {
       id: `act-${Date.now()}`,
       type: 'note',
@@ -192,7 +299,16 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
 
     ownerApi
       .deleteLead(leadId)
-      .then(() => showToast('Lead record deleted.'))
+      .then(() => {
+        logAndSet({
+          action: 'lead_deleted',
+          actor: 'Owner',
+          targetId: leadId,
+          targetName: removed?.name,
+          details: 'Lead record deleted.',
+        });
+        showToast('Lead record deleted.');
+      })
       .catch((err) => {
         showToast(err.message || 'Failed to delete lead', 'error');
         if (removed) setLeads((prev) => [removed, ...prev]);
@@ -207,7 +323,70 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
+    trackExport({ format: 'json', mode: 'owner', count: leads.length });
+    logAndSet({
+      action: 'export_json',
+      actor: 'Owner',
+      details: `Exported ${leads.length} leads to JSON.`,
+    });
     showToast('Leads exported to JSON format.');
+  };
+
+  const exportCsv = () => {
+    downloadLeadsCsv(filteredLeads, 'Owner');
+    trackExport({ format: 'csv', mode: 'owner', count: filteredLeads.length });
+    setAuditEvents(readAuditEvents()); // downloadLeadsCsv logs the event itself
+    showToast(`Exported ${filteredLeads.length} leads to CSV.`);
+  };
+
+  const contacts = useMemo(() => buildContactsFromLeads(leads), [leads]);
+
+  const getLinkedLeads = (contactId: string): Lead[] => {
+    const contact = contacts.find((c) => c.id === contactId);
+    if (!contact) return [];
+    const ids = new Set(contact.linkedLeadIds);
+    return leads.filter((l) => ids.has(l.id));
+  };
+
+  // ── Lead Sources Management (owner-persisted in localStorage) ──
+  const addSource = ({ name, category }: { name: string; category: string }): LeadSource | null => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      showToast('Source name cannot be empty.', 'error');
+      return null;
+    }
+    if (sources.some(s => s.name.toLowerCase() === trimmed.toLowerCase())) {
+      showToast(`Source "${trimmed}" already exists.`, 'error');
+      return null;
+    }
+    const now = new Date().toISOString();
+    const newSource: LeadSource = {
+      id: `src-${Date.now()}`,
+      name: trimmed,
+      category: category.trim() || 'Other',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setSources((prev) => [...prev, newSource]);
+    showToast(`Lead source "${newSource.name}" added.`);
+    return newSource;
+  };
+
+  const updateSource = (id: string, updates: Partial<LeadSource>) => {
+    setSources((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s)));
+  };
+
+  const deleteSource = (id: string) => {
+    const removed = sources.find((s) => s.id === id);
+    setSources((prev) => prev.filter((s) => s.id !== id));
+    showToast(`Lead source "${removed?.name || id}" deleted.`);
+  };
+
+  const clearAuditLog = () => {
+    clearAuditStorage();
+    setAuditEvents([]);
+    showToast('Audit log cleared.');
   };
 
   const signOut = () => {
@@ -263,6 +442,15 @@ export function OwnerLeadProvider({ children, onSignedOut }: { children: ReactNo
         quickAddDemoLead: () => {},
         resetToDefaults: () => {},
         exportData,
+        exportCsv,
+        contacts,
+        getLinkedLeads,
+        sources,
+        addSource,
+        updateSource,
+        deleteSource,
+        auditEvents,
+        clearAuditLog,
       }}
     >
       {children}

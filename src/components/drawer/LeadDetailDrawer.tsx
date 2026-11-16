@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useLeads } from '../../context/LeadContext';
 import { STAGES, PRIORITIES, QUICK_TEMPLATES } from '../../data/initialLeads';
 import { formatCurrency, formatDate, formatShortDate, getFollowUpStatus, getWhatsAppUrl } from '../../lib/utils';
 import { Lead, Quotation, Invoice, ActivityType, PriorityId } from '../../types';
-import DocumentPreviewModal from '../modals/DocumentPreviewModal';
-import CreateDocumentModal from '../modals/CreateDocumentModal';
 import { 
   X, 
   Phone, 
@@ -22,6 +20,10 @@ import {
   ArrowRight,
   Eye
 } from 'lucide-react';
+
+// Heavy document modals loaded on demand — only fetched when a document is opened/created
+const DocumentPreviewModal = lazy(() => import('../modals/DocumentPreviewModal'));
+const CreateDocumentModal = lazy(() => import('../modals/CreateDocumentModal'));
 
 export default function LeadDetailDrawer() {
   const { 
@@ -913,21 +915,29 @@ export default function LeadDetailDrawer() {
       </div>
 
       {/* Document View & Print Modal */}
-      <DocumentPreviewModal
-        isOpen={isDocPreviewOpen}
-        onClose={() => setIsDocPreviewOpen(false)}
-        doc={previewDoc}
-        lead={selectedLead}
-        type={previewType}
-      />
+      {isDocPreviewOpen && (
+        <Suspense fallback={null}>
+          <DocumentPreviewModal
+            isOpen={isDocPreviewOpen}
+            onClose={() => setIsDocPreviewOpen(false)}
+            doc={previewDoc}
+            lead={selectedLead}
+            type={previewType}
+          />
+        </Suspense>
+      )}
 
       {/* Create New Quotation / Invoice Modal */}
-      <CreateDocumentModal
-        isOpen={isCreateDocOpen}
-        onClose={() => setIsCreateDocOpen(false)}
-        lead={selectedLead}
-        docType={createDocType}
-      />
+      {isCreateDocOpen && (
+        <Suspense fallback={null}>
+          <CreateDocumentModal
+            isOpen={isCreateDocOpen}
+            onClose={() => setIsCreateDocOpen(false)}
+            lead={selectedLead}
+            docType={createDocType}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

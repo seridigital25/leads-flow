@@ -36,4 +36,18 @@ await sql`
 await sql`CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC)`;
 await sql`CREATE INDEX IF NOT EXISTS leads_stage_idx ON leads (stage)`;
 
-console.log('leads table ready.');
+await sql`
+  CREATE TABLE IF NOT EXISTS audit_events (
+    id TEXT PRIMARY KEY,
+    action TEXT NOT NULL,
+    actor TEXT NOT NULL DEFAULT 'unknown',
+    target_id TEXT,
+    target_name TEXT,
+    details TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )
+`;
+
+await sql`CREATE INDEX IF NOT EXISTS audit_events_created_at_idx ON audit_events (created_at DESC)`;
+
+console.log('leads and audit_events tables ready.');
