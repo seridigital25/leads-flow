@@ -1,10 +1,12 @@
 import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LeadProvider } from './context/LeadContext';
 
 // Route-level code splitting: each page is loaded on demand
 const Landing = lazy(() => import('./pages/Landing'));
 const Owner = lazy(() => import('./pages/Owner'));
 const CRMShell = lazy(() => import('./components/CRMShell'));
+const QuotationPrintPage = lazy(() => import('./pages/Print/QuotationPrintPage'));
 
 function RouteFallback() {
   return (
@@ -19,15 +21,19 @@ export default function App() {
 
   return (
     <Suspense fallback={<RouteFallback />}>
-      {pathname.startsWith('/owner') && <Owner />}
-
-      {pathname.startsWith('/demo') && (
-        <LeadProvider>
-          <CRMShell />
-        </LeadProvider>
-      )}
-
-      {!pathname.startsWith('/owner') && !pathname.startsWith('/demo') && <Landing />}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/owner" element={<Owner />} />
+          <Route path="/print/quotation/:id" element={<QuotationPrintPage />} />
+          <Route path="/print/invoice/:id" element={<QuotationPrintPage />} />
+          <Route path="/demo" element={
+            <LeadProvider>
+              <CRMShell />
+            </LeadProvider>
+          } />
+          <Route path="/" element={<Landing />} />
+        </Routes>
+      </BrowserRouter>
     </Suspense>
   );
 }

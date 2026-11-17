@@ -28,3 +28,10 @@ dist-ssr
 
 # Private Invoices
 docs/invoices/
+.vercel
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
